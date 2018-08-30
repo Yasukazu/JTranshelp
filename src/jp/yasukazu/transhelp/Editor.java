@@ -244,9 +244,12 @@ public class Editor extends ArrayList<Object> {
 			void recur(List<Object> stack) {
 				for (Object obj : stack) {
 					if (obj instanceof EnclosedArray) {
-						bldr.append(((EnclosedArray)obj).getBegin());
+						boolean print = ((EnclosedArray)obj).getPair() != Enblock.bracketPair.BRACKET;
+						if (print)
+							bldr.append(((EnclosedArray)obj).getBegin());
 						recur((EnclosedArray)obj);
-						bldr.append(((EnclosedArray)obj).getEnd());
+						if (print)
+							bldr.append(((EnclosedArray)obj).getEnd());
 					}
 					else {
 						bldr.append(obj);
