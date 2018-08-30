@@ -5,9 +5,15 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.stream.Collectors;
 import java.text.Normalizer;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.stream.Collectors;
+import java.text.Normalizer;
 //import com.ibm.icu.text.Normalizer;
 
-public class Transhelp {
+public class Transhelp extends ArrayList<HasStopString> {
   enum punct {
     KUTEN('\u3002'),
     ;
@@ -22,17 +28,17 @@ public class Transhelp {
   }
   List<String> org_lines;
   List<String> nrm_lines;
-  List<HasStopString> sentences;
+  //List<HasStopString> sentences;
   public Transhelp(List<String> lines){
+	super();
     org_lines = lines;
     nrm_lines = lines.stream()
     .map(str -> Normalizer.normalize(str, Normalizer.Form.NFKC)).collect(Collectors.toList());
-    sentences = getYsentence(nrm_lines);
-    
+    addAll(getYsentence(nrm_lines));    
   }
   
   public List<HasStopString> getSentences() {
-	  return this.sentences;
+	  return this;
   }
   
   List<HasStopString> getYsentence(List<String> lines){
@@ -51,6 +57,30 @@ public class Transhelp {
 
   public List<String> normalizedTexts(){
     return nrm_lines;
-  };
+  }
+  TranshelpException exception;
+  public TranshelpException getException() {
+	  return exception;
+  }
+  /**
+   * 
+   * @return null if fail, remaining TranshelpException available by getException().
+   */
+  public List<Editor> editAll() {
+	  List<Editor> editorList = new ArrayList<Editor> ();
+	  exception = null;
+	  forEach(snt -> {
+		  try {
+			  List<Object> nlist = Enblock.load(snt.str);
+			  Editor edt = new Editor(nlist, snt.stop);
+			  edt.recurEdit(Editor.cmdKey.REVERSE); //do_reverse();
+			  editorList.add(edt);
+		  }
+		  catch (TranshelpException e) {
+			  exception = e;
+		  }
+	  });
+	  return exception == null ? editorList : null;
+  }
 
 }

@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Enblock {//extends ArrayList<Object> {
+@SuppressWarnings("serial")
+public class Enblock extends ArrayList<Object> {
 
 	List<Object> list;
 	public Enblock(String txt) throws TranshelpException {
@@ -84,8 +85,8 @@ public class Enblock {//extends ArrayList<Object> {
 			char ch = st.charAt(pos);
 			Enblock.bracketPair pair = Enblock.getPair(ch); 
 			if (pair != Enblock.bracketPair.NUL) {
-				if (buff.length() > 0) {
-					stack.addAll(new ArrayList<String>(Arrays.asList(buff.toString().split("\\s"))));
+				if (buff.length() > 0 && buff.toString().trim().length() > 0) {
+					stack.addAll(new ArrayList<String>(Arrays.asList(buff.toString().split("\\s+"))));
 					buff.setLength(0);
 				}
 				if (pos + 1 >= st.length())
@@ -110,7 +111,7 @@ public class Enblock {//extends ArrayList<Object> {
 				buff.append(ch);
 			pos += 1;
 		}
-		if (buff.length() > 0)
+		if (buff.length() > 0 && buff.toString().trim().length() > 0)
 			stack.addAll(new ArrayList<String>(Arrays.asList(buff.toString().split("\\s"))));
 		return stack;
 	}
@@ -130,8 +131,8 @@ public class Enblock {//extends ArrayList<Object> {
 			char ch = st.charAt(pos);
 			Enblock.bracketPair pair = Enblock.getPair(ch); 
 			if (pair != Enblock.bracketPair.NUL) {
-				if (buff.length() > 0) {
-					stack.addAll(new ArrayList<String>(Arrays.asList(buff.toString().split("\\s"))));
+				if (buff.length() > 0 && buff.toString().trim().length() > 0) {
+					stack.addAll(new ArrayList<String>(Arrays.asList(buff.toString().split("\\s+"))));
 					buff.setLength(0);
 				}
 				if (pos + 1 >= st.length())
@@ -156,8 +157,8 @@ public class Enblock {//extends ArrayList<Object> {
 				buff.append(ch);
 			}			
 		}
-		if (buff.length() > 0) {
-			for(String str : buff.toString().split("\\s"))  
+		if (buff.length() > 0 && buff.toString().trim().length() > 0) {
+			for(String str : buff.toString().split("\\s+"))  
 				stack.add(str);
 		}
 		return stack;

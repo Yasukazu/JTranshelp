@@ -1,5 +1,5 @@
 package jp.yasukazu.transhelp;
-
+// 2018/8/30 YtM @ yasukazu.jp
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -109,7 +109,7 @@ public class Editor extends ArrayList<Object> {
 		
 		/**
 		 * 
-		 * @return int[2] (but null if error) of Position and run-length
+		 * @return int[] (but null if error) of Position and Run-length
 		 * @throws TranshelpException 
 		 */
 		int[] get() throws TranshelpException {
@@ -120,74 +120,41 @@ public class Editor extends ArrayList<Object> {
 				return null;
 			if (ps == 0 && pos == 0)
 				throw new TranshelpException("No item before " + sym);
-			List<Object> subslice = sliced().subList(ps, sliced().size());		
-			Object lastObj = subslice.get(0);
-			int proceed = 0;
-			for (Object obj : subslice) {
+			if (ps == sliced().size()-1)
+				throw new TranshelpException("Ends with " + sym);
+			List<Object> subslice = sliced().subList(ps, sliced().size());					
+			int prcd = 0; // proceed			
+			for (Object lastObj = subslice.get(prcd++); prcd < subslice.size(); ++prcd) {
+				Object obj = subslice.get(prcd);
 				if (lastObj instanceof Character) {
-					if (obj instanceof Character)
-						throw new TranshelpException("Duplicating Operator " + sym);
-					else {
-						lastObj = obj;
-						++proceed;
-					}
+					if (obj instanceof Character && (Character)obj == sym)
+						throw new TranshelpException("Duplicating same Operator " + sym);
 				}
-				else {
-					if (obj instanceof Character)
-						if ((Character)obj != sym)
-							throw new TranshelpException("Mix Operator " + sym);
-						else {
-							lastObj = obj;
-							++proceed;
-						}
-					else
-						break;
-				}
-			}
-			/*
-			class Get2List {
-				List<Object> list;
-				Get2List(List<Object> lst) {
-					list = lst;
-				}	
-				List<Object> get2() {
-					if (list.size() < 2)
-						return null;
-					List<Object> hd = new ArrayList<Object>();
-					hd.addAll(list.subList(0, 2));
-					list.subList(0, 2).clear();
-					return hd;
-				}
-			}
-
-			Get2List io = new Get2List(sliced().subList(ps, sliced().size()));
-			int len = 0; // real length - 1
-			List<Object> pp;
-			while ((pp = io.get2())!= null) {
-				if (ispat(pp))
-					len += 2;
 				else
-					break;
+					if (!(obj instanceof Character) || (Character)obj != sym) 
+						break;
+				lastObj = obj;
 			}
-			*/
-			if (proceed == 0)
-				return null;
-			int[] rvs = {pos + ps - 1, proceed + 1};
-			pos += ps + proceed;
+			int[] rvs = {pos + ps - 1, prcd + 1};
+			pos += ps + prcd;
 			return rvs;
 		}
 						
 		/**
 		 * 
-		 * @return null if unavailable
+		 * @return : view of subList starting pos but null if unavailable
 		 */
 		List<Object> sliced() {		
 			return pos < aa.size() ? aa.subList(pos, aa.size()) : null; 
 		}
 	}
-
-	public Editor(List<Object> list) {
+	char stopChar;
+	public Editor(List<Object> list, char stop) {
 		super(list);
+		stopChar = stop;
+	}
+	public char getStop() {
+		return stopChar;
 	}
 		
 	/**
