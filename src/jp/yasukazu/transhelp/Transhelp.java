@@ -47,7 +47,10 @@ public class Transhelp extends ArrayList<HasStopString> {
     String rgx_dlms = "(?<=[" + punct.KUTEN.ch + "])";
     List<String> split_list = Arrays.asList(line.split(rgx_dlms));
     List<HasStopString> return_list = new ArrayList<>();
-    split_list.forEach(ln -> return_list.add(HasStopString.toHasStopString(ln)));//, ln.charAt(ln.length()-1) == punct.KUTEN.ch))); 
+    split_list.forEach(ln -> { 
+    	HasStopString hss = HasStopString.toHasStopString(ln); 
+    	return_list.add(hss);
+    });
     return return_list;
   }
 
