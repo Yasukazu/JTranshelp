@@ -10,3 +10,6 @@ A translation helper program for English to Japanese translation implemented int
   4. Non-printable characters : 表示されない文字
    - Operators: /　: 変換子
    - Brackets: [ ] : 角括弧 
+
+ ## Not yet implemented : まだ実装していないもの
+  - Isolate sub sentences (,) : コンマによる句の分離
