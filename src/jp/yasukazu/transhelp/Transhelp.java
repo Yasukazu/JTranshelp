@@ -10,7 +10,21 @@ import java.text.Normalizer;
 @SuppressWarnings("serial")
 public class Transhelp extends ArrayList<HasStopString> {
   enum punct {
-    KUTEN('\u3002'),
+	CJKSPC('\u3000'),
+	CJKFSTP('\u3001'), //TOUTEN o
+    CJKCOMMA('\u3002'), //KUTEN \
+    EXCL('!'),
+    QSTN('?'),
+    COMMA(','),
+    FLSTP('.'),
+    COLON(':'),
+    SEMI(';'),
+    WEXCL('\uFF01'),
+    WQSTN('\uFF1F'),
+    WCOMMA('\uFF0C'),
+    WFLSTP('\uFF0E'),
+    WCOLON('\uFF1A'),
+    WSEMI('\uFF1B'),
     ;
     private char ch;
     punct(char ch){
@@ -29,7 +43,7 @@ public class Transhelp extends ArrayList<HasStopString> {
 	super();
     org_lines = lines;
     nrm_lines = lines.stream()
-    .map(str -> Normalizer.normalize(str, Normalizer.Form.NFKC)).collect(Collectors.toList());
+    .map(str -> Normalizer.normalize(str, Normalizer.Form.NFC)).collect(Collectors.toList());
     addAll(getYsentence(nrm_lines));    
   }
   
