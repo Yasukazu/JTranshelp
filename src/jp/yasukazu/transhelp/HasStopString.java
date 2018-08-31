@@ -1,5 +1,6 @@
 package jp.yasukazu.transhelp;
 import java.util.Arrays;
+import jp.yasukazu.transhelp.Transhelp.punct;
 // 2018/8/31 : wide stop characters
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -11,42 +12,18 @@ import java.util.Set;
  *
  */
 public class HasStopString {
-	enum stopChars {
-	    CJKSPC('\u3000'),
-	    TOUTEN('\u3001'),
-	    KUTEN('\u3002'),
-	    EXCL('!'),
-	    QSTN('?'),
-	    COMMA(','),
-	    FLSTP('.'),
-	    COLON(':'),
-	    SEMI(';'),
-	    WEXCL('\uFF01'),
-	    WQSTN('\uFF1F'),
-	    WCOMMA('\uFF0C'),
-	    WFLSTP('\uFF0E'),
-	    WCOLON('\uFF1A'),
-	    WSEMI('\uFF1B'),
-	    ;
-	    private char ch;
-	    stopChars(char ch){
-	      this.ch = ch;
-	    }
-	    public char getChar(){
-	      return this.ch;
-	    }		
-	}
+
 	static Set<Character> stopCharSet;
 	static String stopCharStr;
-	static stopChars[] wStopChars = {stopChars.KUTEN, stopChars.WEXCL, stopChars.WFLSTP, stopChars.WQSTN};
+	static punct[] wStopChars = {punct.WEXCL, punct.WFLSTP, punct.WQSTN};
 	static Set<Character> wStopCharSet;
 	static String wStopCharStr;
 	static Set<Character> fullstopCharSet;
 	static String fullstopCharStr;
-	static stopChars[] fullstopChars = {stopChars.KUTEN, stopChars.WEXCL, stopChars.WFLSTP, stopChars.WQSTN};
+	static punct[] fullstopChars = {punct.KUTEN, punct.WEXCL, punct.WFLSTP, punct.WQSTN};
 	static {
 		stopCharSet = new HashSet<Character>();
-		EnumSet.allOf(stopChars.class).forEach(it -> stopCharSet.add(it.ch));
+		EnumSet.allOf(punct.class).forEach(it -> stopCharSet.add(it.ch));
 		StringBuilder sb = new StringBuilder();
 		for (Character ch : stopCharSet)
 			sb.append(ch);
