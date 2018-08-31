@@ -1,5 +1,7 @@
 package jp.yasukazu.transhelp;
-
+import java.util.Arrays;
+import jp.yasukazu.transhelp.Transhelp.punct;
+// 2018/8/31 : wide stop characters
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
@@ -10,24 +12,28 @@ import java.util.Set;
  *
  */
 public class HasStopString {
-	enum stopChars {
-	    KUTEN('\u3002'),
-	    QSTN('?'),
-	    EXCL('!'),
-	    FULL('.'),
-	    ;
-	    private char ch;
-	    stopChars(char ch){
-	      this.ch = ch;
-	    }
-	    public char getChar(){
-	      return this.ch;
-	    }		
-	}
+
 	static Set<Character> stopCharSet;
+	static String stopCharStr;
+	static punct[] wStopChars = {punct.WEXCL, punct.WFLSTP, punct.WQSTN};
+	static Set<Character> wStopCharSet;
+	static String wStopCharStr;
+	static Set<Character> fullstopCharSet;
+	static String fullstopCharStr;
+	static punct[] fullstopChars = {punct.KUTEN, punct.WEXCL, punct.WFLSTP, punct.WQSTN};
 	static {
 		stopCharSet = new HashSet<Character>();
-		EnumSet.allOf(stopChars.class).forEach(it -> stopCharSet.add(it.ch));
+		EnumSet.allOf(punct.class).forEach(it -> stopCharSet.add(it.ch));
+		StringBuilder sb = new StringBuilder();
+		for (Character ch : stopCharSet)
+			sb.append(ch);
+		stopCharStr = sb.toString();
+		wStopCharSet = new HashSet<Character>();
+		Arrays.asList(wStopChars).forEach(sc -> wStopCharSet.add(sc.ch));
+		sb.setLength(0);
+		for (Character ch : wStopCharSet)
+			sb.append(ch);
+		wStopCharStr = sb.toString();		
 	}
 
 	public static HasStopString toHasStopString(String str) {
@@ -45,11 +51,12 @@ public class HasStopString {
 		this.str = str;
 		this.stop = stop;
 	}
-	/*
+	
 	HasStopString(String str, boolean has_stop){
 		this.str = has_stop ? str.substring(0, str.length()-1) : str;
 		this.stop = has_stop ? str.charAt(str.length()-1) : 0;
-	}*/
+	}
+	
 	public String getStr() {
 		return this.str;
 	}
@@ -67,3 +74,4 @@ public class HasStopString {
 	}
 
 }
+
