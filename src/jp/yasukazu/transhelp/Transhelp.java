@@ -1,18 +1,13 @@
 package jp.yasukazu.transhelp;
+// 2018/8/31 YtM @yasukazu.jp
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.stream.Collectors;
 import java.text.Normalizer;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.stream.Collectors;
-import java.text.Normalizer;
-//import com.ibm.icu.text.Normalizer;
 
+@SuppressWarnings("serial")
 public class Transhelp extends ArrayList<HasStopString> {
   enum punct {
     KUTEN('\u3002'),
@@ -26,6 +21,7 @@ public class Transhelp extends ArrayList<HasStopString> {
     }
 
   }
+
   List<String> org_lines;
   List<String> nrm_lines;
   //List<HasStopString> sentences;
@@ -51,7 +47,7 @@ public class Transhelp extends ArrayList<HasStopString> {
     String rgx_dlms = "(?<=[" + punct.KUTEN.ch + "])";
     List<String> split_list = Arrays.asList(line.split(rgx_dlms));
     List<HasStopString> return_list = new ArrayList<>();
-    split_list.forEach(ln -> return_list.add(new HasStopString(ln, ln.charAt(ln.length()-1) == punct.KUTEN.ch))); 
+    split_list.forEach(ln -> return_list.add(HasStopString.toHasStopString(ln)));//, ln.charAt(ln.length()-1) == punct.KUTEN.ch))); 
     return return_list;
   }
 
