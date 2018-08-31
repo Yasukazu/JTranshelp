@@ -24,12 +24,10 @@ public class HasStopString {
 	      return this.ch;
 	    }		
 	}
-	static EnumSet<stopChars> stopSet;
 	static Set<Character> stopCharSet;
 	static {
 		stopCharSet = new HashSet<Character>();
-		//EnumSet.allOf(stopChars.class).
-		stopSet.forEach(it -> stopCharSet.add(it.ch));
+		EnumSet.allOf(stopChars.class).forEach(it -> stopCharSet.add(it.ch));
 	}
 
 	public static HasStopString toHasStopString(String str) {
