@@ -14,19 +14,20 @@ import java.text.Normalizer;
 @SuppressWarnings("serial")
 public class Transhelp extends ArrayList<HasStopString> {
   enum punct {
+	  SPC('\u0020'),
 	WSPC('\u3000'),
-	IDGFSTP('\u3001'), //TOUTEN o
+	IDGFSTOP('\u3001'), //TOUTEN o
     IDGCOMMA('\u3002'), //KUTEN \
     EXCL('!'),
     QSTN('?'),
     COMMA(','),
-    FLSTP('.'),
+    FLSTOP('.'),
     COLON(':'),
     SEMI(';'),
     WEXCL('\uFF01'),
     WQSTN('\uFF1F'),
     WCOMMA('\uFF0C'),
-    WFLSTP('\uFF0E'),
+    WFLSTOP('\uFF0E'),
     WCOLON('\uFF1A'),
     WSEMI('\uFF1B'),
     ;
