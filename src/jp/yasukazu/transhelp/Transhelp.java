@@ -1,10 +1,16 @@
 package jp.yasukazu.transhelp;
 // 2018/8/31 YtM @yasukazu.jp
 import java.util.List;
+import java.util.Set;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.stream.Collectors;
+
+import jp.yasukazu.transhelp.Transhelp.punct;
+
 import java.text.Normalizer;
 
 @SuppressWarnings("serial")
@@ -35,8 +41,17 @@ public class Transhelp extends ArrayList<HasStopString> {
     }
 
   }
-
-  List<String> org_lines;
+	static Set<Character> punctCharSet;
+	static String punctCharStr;
+	static {
+		punctCharSet = new HashSet<Character>();
+		EnumSet.allOf(punct.class).forEach(it -> punctCharSet.add(it.getChar()));
+		StringBuilder sb = new StringBuilder();
+		for (Character ch : punctCharSet)
+			sb.append(ch);
+		punctCharStr = sb.toString();		
+	}
+	List<String> org_lines;
   List<String> nrm_lines;
   //List<HasStopString> sentences;
   public Transhelp(List<String> lines){
@@ -58,7 +73,7 @@ public class Transhelp extends ArrayList<HasStopString> {
   }
 
   List<HasStopString> stop_split(String line){
-    String rgx_dlms = "(?<=[" + punct.KUTEN.ch + "])";
+    String rgx_dlms = "(?<=[" + punct.CJKCOMMA.ch + "])";
     List<String> split_list = Arrays.asList(line.split(rgx_dlms));
     List<HasStopString> return_list = new ArrayList<>();
     split_list.forEach(ln -> { 

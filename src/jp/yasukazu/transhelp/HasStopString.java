@@ -12,25 +12,13 @@ import java.util.Set;
  *
  */
 public class HasStopString {
-
-	static Set<Character> stopCharSet;
-	static String stopCharStr;
 	static punct[] wStopChars = {punct.WEXCL, punct.WFLSTP, punct.WQSTN};
 	static Set<Character> wStopCharSet;
 	static String wStopCharStr;
-	static Set<Character> fullstopCharSet;
-	static String fullstopCharStr;
-	static punct[] fullstopChars = {punct.KUTEN, punct.WEXCL, punct.WFLSTP, punct.WQSTN};
 	static {
-		stopCharSet = new HashSet<Character>();
-		EnumSet.allOf(punct.class).forEach(it -> stopCharSet.add(it.ch));
-		StringBuilder sb = new StringBuilder();
-		for (Character ch : stopCharSet)
-			sb.append(ch);
-		stopCharStr = sb.toString();
 		wStopCharSet = new HashSet<Character>();
-		Arrays.asList(wStopChars).forEach(sc -> wStopCharSet.add(sc.ch));
-		sb.setLength(0);
+		Arrays.asList(wStopChars).forEach(sc -> wStopCharSet.add(sc.getChar()));
+		StringBuilder sb = new StringBuilder();
 		for (Character ch : wStopCharSet)
 			sb.append(ch);
 		wStopCharStr = sb.toString();		
@@ -41,7 +29,7 @@ public class HasStopString {
 		if (str.length() == 0)
 			return new HasStopString("", '\0');
 		char lastc = str.charAt(str.length() - 1);
-		if (!stopCharSet.contains(lastc))
+		if (!wStopCharSet.contains(lastc))
 			return new HasStopString(str, '\0');			
 		return new HasStopString(str.substring(0, str.length() - 1), lastc);
 	}
