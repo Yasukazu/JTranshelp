@@ -80,13 +80,14 @@ public class Enblock extends ArrayList<Object> {
 	public static List<String> sentence_split(String st) throws TranshelpException {
 		List<String> stack = new ArrayList<String>();
 		StringBuilder buff = new StringBuilder();
+		String dlmrx = "[\\s" + Transhelp.punct.WSPC + "]+";
 		int pos = 0;
 		while (pos < st.length()) {
 			char ch = st.charAt(pos);
 			Enblock.bracketPair pair = Enblock.getPair(ch); 
 			if (pair != Enblock.bracketPair.NUL) {
 				if (buff.length() > 0 && buff.toString().trim().length() > 0) {
-					stack.addAll(new ArrayList<String>(Arrays.asList(buff.toString().split("\\s+"))));
+					stack.addAll(new ArrayList<String>(Arrays.asList(buff.toString().split(dlmrx))));
 					buff.setLength(0);
 				}
 				if (pos + 1 >= st.length())
@@ -112,7 +113,7 @@ public class Enblock extends ArrayList<Object> {
 			pos += 1;
 		}
 		if (buff.length() > 0 && buff.toString().trim().length() > 0)
-			stack.addAll(new ArrayList<String>(Arrays.asList(buff.toString().split("\\s"))));
+			stack.addAll(new ArrayList<String>(Arrays.asList(buff.toString().split(dlmrx))));
 		return stack;
 	}
 	
@@ -126,13 +127,13 @@ public class Enblock extends ArrayList<Object> {
 		}
 		List<Object> stack = new ArrayList<>();
 		StringBuilder buff = new StringBuilder();
-		
+		String dlmrx = "[\\s" + Transhelp.punct.WSPC + "]+";		
 		for (int pos = 0; pos < st.length(); ++pos) {
 			char ch = st.charAt(pos);
 			Enblock.bracketPair pair = Enblock.getPair(ch); 
 			if (pair != Enblock.bracketPair.NUL) {
 				if (buff.length() > 0 && buff.toString().trim().length() > 0) {
-					stack.addAll(new ArrayList<String>(Arrays.asList(buff.toString().split("\\s+"))));
+					stack.addAll(new ArrayList<String>(Arrays.asList(buff.toString().split(dlmrx))));
 					buff.setLength(0);
 				}
 				if (pos + 1 >= st.length())
@@ -158,7 +159,7 @@ public class Enblock extends ArrayList<Object> {
 			}			
 		}
 		if (buff.length() > 0 && buff.toString().trim().length() > 0) {
-			for(String str : buff.toString().split("\\s+"))  
+			for(String str : buff.toString().split(dlmrx))  
 				stack.add(str);
 		}
 		return stack;
