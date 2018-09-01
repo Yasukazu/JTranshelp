@@ -9,16 +9,14 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.stream.Collectors;
 
-import jp.yasukazu.transhelp.Transhelp.punct;
-
 import java.text.Normalizer;
 
 @SuppressWarnings("serial")
 public class Transhelp extends ArrayList<HasStopString> {
   enum punct {
-	CJKSPC('\u3000'),
-	CJKFSTP('\u3001'), //TOUTEN o
-    CJKCOMMA('\u3002'), //KUTEN \
+	WSPC('\u3000'),
+	IDGFSTP('\u3001'), //TOUTEN o
+    IDGCOMMA('\u3002'), //KUTEN \
     EXCL('!'),
     QSTN('?'),
     COMMA(','),
@@ -58,7 +56,11 @@ public class Transhelp extends ArrayList<HasStopString> {
 	super();
     org_lines = lines;
     nrm_lines = lines.stream()
-    .map(str -> Normalizer.normalize(str, Normalizer.Form.NFC)).collect(Collectors.toList());
+    .map(str -> {
+    	String nstr = Normalizer.normalize(str.trim(), Normalizer.Form.NFC);
+    	return nstr;
+    })
+	.collect(Collectors.toList());
     addAll(getYsentence(nrm_lines));    
   }
   
@@ -73,7 +75,7 @@ public class Transhelp extends ArrayList<HasStopString> {
   }
 
   List<HasStopString> stop_split(String line){
-    String rgx_dlms = "(?<=[" + punct.CJKCOMMA.ch + "])";
+    String rgx_dlms = "(?<=[" + punct.IDGCOMMA.ch + "])";
     List<String> split_list = Arrays.asList(line.split(rgx_dlms));
     List<HasStopString> return_list = new ArrayList<>();
     split_list.forEach(ln -> { 
