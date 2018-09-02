@@ -16,8 +16,8 @@ public class Transhelp extends ArrayList<HasStopString> {
   enum punct {
 	SPC('\u0020'),
 	WSPC('\u3000'),
-	IDGFSTOP('\u3001'), //TOUTEN o
-    IDGCOMMA('\u3002'), //KUTEN \
+    IDGCOMMA('\u3001'), //KUTEN \
+	IDGFSTOP('\u3002'), //TOUTEN o
     EXCL('!'),
     QSTN('?'),
     COMMA(','),
@@ -40,6 +40,18 @@ public class Transhelp extends ArrayList<HasStopString> {
     }
 
   }
+  enum wpunct {
+		WSPC,
+		IDGFSTOP,
+	    IDGCOMMA,	  
+	    WEXCL,
+	    WQSTN,
+	    WCOMMA,
+	    WFLSTOP,
+	    WCOLON,
+	    WSEMI,
+	    ;
+  }
 	static Set<Character> punctCharSet;
 	static String punctCharStr;
 	static {
@@ -53,6 +65,10 @@ public class Transhelp extends ArrayList<HasStopString> {
 	List<String> org_lines;
   List<String> nrm_lines;
   //List<HasStopString> sentences;
+  /**
+   * Constructor
+   * @param lines
+   */
   public Transhelp(List<String> lines){
 	super();
     org_lines = lines;
@@ -76,42 +92,33 @@ public class Transhelp extends ArrayList<HasStopString> {
   }
 
   List<HasStopString> stop_split(String line){
-    String rgx_dlms = "(?<=[" + punct.IDGCOMMA.ch + "])";
-    List<String> split_list = Arrays.asList(line.split(rgx_dlms));
-    List<HasStopString> return_list = new ArrayList<>();
-    split_list.forEach(ln -> { 
-    	HasStopString hss = HasStopString.toHasStopString(ln); 
-    	return_list.add(hss);
-    });
-    return return_list;
+    String rgx_dlms = "(?<=[" + punct.IDGFSTOP.ch + "])";
+    List<Object> split_list = Arrays.asList((Object[])line.split(rgx_dlms));
+    return split_list.stream().map(ln -> HasStopString.toHasStopString((String)ln)).collect(Collectors.toList()); 
   }
 
   public List<String> normalizedTexts(){
     return nrm_lines;
   }
-  TranshelpException exception;
-  public TranshelpException getException() {
-	  return exception;
-  }
+
   /**
-   * 
-   * @return null if fail, remaining TranshelpException available by getException().
+   * @exception 
+   * @return 
    */
-  public List<Editor> editAll() {
+  public List<Editor> editAll() throws TranshelpException {
 	  List<Editor> editorList = new ArrayList<Editor> ();
-	  exception = null;
-	  forEach(snt -> {
-		  try {
-			  List<Object> nlist = Enblock.load(snt.str);
-			  Editor edt = new Editor(nlist, snt.stop);
-			  edt.recurEdit(Editor.cmdKey.REVERSE); //do_reverse();
+	try {
+	  for(HasStopString snt : this) {
+				Enblock block = new Enblock(snt.str);
+			  Editor edt = new Editor(block, snt.stop);
+			  edt.recurEdit(Editor.cmdEnum.REVERSE); //do_reverse();
 			  editorList.add(edt);
-		  }
-		  catch (TranshelpException e) {
-			  exception = e;
-		  }
-	  });
-	  return exception == null ? editorList : null;
+	  }
+		}
+		catch (TranshelpException e) {
+			throw new TranshelpException("Improper grammer: " + e.getMessage());
+		}
+	  return editorList;
   }
 
 }
