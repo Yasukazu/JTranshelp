@@ -9,7 +9,14 @@ public class Enblock extends ArrayList<Object> {
 
 	List<Object> list;
 	public Enblock(String txt) throws TranshelpException {
-		list = _load(txt, 0);
+		super();
+		try {
+			list = _load(txt, 0);
+		}
+		catch (TranshelpException e) {
+			throw new TranshelpException(e.getMessage());
+		}
+		addAll(list);
 	}
 	public List<Object> getList() {
 		return list;
