@@ -87,7 +87,7 @@ public class Enblock extends ArrayList<Object> {
 	public static List<String> sentence_split(String st) throws TranshelpException {
 		List<String> stack = new ArrayList<String>();
 		StringBuilder buff = new StringBuilder();
-		String dlmrx = "[\\s" + Transhelp.punct.WSPC + "]+";
+		String dlmrx = "[\\s" + Transhelp.spaceCharEnum.WSPC + "]+";
 		int pos = 0;
 		while (pos < st.length()) {
 			char ch = st.charAt(pos);
@@ -134,7 +134,7 @@ public class Enblock extends ArrayList<Object> {
 		}
 		List<Object> stack = new ArrayList<>();
 		StringBuilder buff = new StringBuilder();
-		String dlmrx = "[\\s" + Transhelp.punct.WSPC + "]+";		
+		String dlmrx = "[\\s" + Transhelp.spaceCharEnum.WSPC + "]+";		
 		for (int pos = 0; pos < st.length(); ++pos) {
 			char ch = st.charAt(pos);
 			Enblock.bracketPair pair = Enblock.getPair(ch); 
