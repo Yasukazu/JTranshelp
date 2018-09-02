@@ -3,6 +3,7 @@ package jp.yasukazu.transhelp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -10,14 +11,24 @@ import java.util.HashSet;
 
 @SuppressWarnings("serial")
 public class Editor extends ArrayList<Object> {
-	static final char REVERSE_C = '/';
-	static final char[] CMDCHSET = {REVERSE_C};
+	  enum cmd {
+			REVERSE('/'),
+		    ;
+		    private char ch;
+		    cmd(char ch){
+		      this.ch = ch;
+		    }
+		    public char getChar(){
+		      return this.ch;
+		    }
+		}
+	  static Set<Character> cmdCharSet;
+	  static String cmdCharStr;
 	static Set<Character> cmdchset;
 	static Map<Character, Cmd> cmdKeyMap;
 	static {
 		cmdchset = new HashSet<Character>();
-		for (char ch : CMDCHSET)
-			cmdchset.add(ch);
+		EnumSet.allOf(cmd.class).forEach(it -> cmdchset.add(it.getChar()));
 	}
 	public interface Cmd {
 		public void exec(List<Object> l);
@@ -38,7 +49,7 @@ public class Editor extends ArrayList<Object> {
 				}
 			if (!includes)
 				return;
-			RunCutter rc = new RunCutter(lst, REVERSE_C);
+			RunCutter rc = new RunCutter(lst, cmd.REVERSE.getChar());
 			int[] pos_len;
 			try {
 				while ((pos_len = rc.get())!= null) {
