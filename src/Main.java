@@ -12,16 +12,16 @@ class Main {
     String usage_filename = "README.md";
     String filename = "input.txt";
     try (Stream<String> stream = Files.lines(Paths.get(filename), StandardCharsets.UTF_8);
-	  Stream<String> usage_stream = Files.lines(Paths.get("..", usage_filename), StandardCharsets.UTF_8))
+	  Stream<String> usage_stream = Files.lines(Paths.get(usage_filename), StandardCharsets.UTF_8))
     {
 	  usage_stream.forEach(System.out::println);
 	  List<String> lines = stream.map(String::trim).collect(Collectors.toList());
 	  Transhelp thelp = new Transhelp(lines);
-	  List<Editor> editorList = thelp.editAll();
-	  if (editorList != null)
+
+		List<Editor> editorList = thelp.editAll();	
 		  for (int i = 0; i < thelp.size(); ++i) {
 			  HasStopString hstr = thelp.get(i);
-			  System.out.println("Orig: " + hstr.str + hstr.stop);
+			  System.out.println("Orig: " + hstr.getStr() + hstr.getStop());
 			  Editor edt = editorList.get(i);
 			  System.out.println("Edit: " + edt.toString() + edt.getStop());			  
 		  }
@@ -29,6 +29,10 @@ class Main {
     catch (IOException e) {
 	  System.out.print("IOException occured: ");
 	  e.printStackTrace();
+	}
+    catch (TranshelpException e) {
+		System.out.println("Sentence is not proper format.");
+		e.printStackTrace();
 	}
   }
 }
