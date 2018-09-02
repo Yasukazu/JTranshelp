@@ -7,9 +7,9 @@ import java.util.List;
 @SuppressWarnings("serial")
 public class Enblock extends ArrayList<Object> {
 
-	List<Object> list;
 	public Enblock(String txt) throws TranshelpException {
 		super();
+		List<Object> list;
 		try {
 			list = _load(txt, 0);
 		}
@@ -18,9 +18,7 @@ public class Enblock extends ArrayList<Object> {
 		}
 		addAll(list);
 	}
-	public List<Object> getList() {
-		return list;
-	}
+
 	public enum bracketPair {
 		PAREN("()"), // kakko
 		BRACKET("[]"), // kaku-kakko
