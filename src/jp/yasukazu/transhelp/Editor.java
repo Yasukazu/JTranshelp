@@ -11,37 +11,44 @@ import java.util.HashSet;
 
 @SuppressWarnings("serial")
 public class Editor extends ArrayList<Object> {
-	  enum cmd {
-			REVERSE('/'),
+	  enum cmdEnum {
+			REVERSE('/', new Reverse(), '\uff0f'),
 		    ;
-		    private char ch;
-		    cmd(char ch){
+		  Cmd cmd;	  
+		  private char ch;
+		  private char wch;
+		    cmdEnum(char ch, Cmd cmd, char wch){
 		      this.ch = ch;
+		      this.cmd = cmd;
+		      this.wch = wch;
 		    }
 		    public char getChar(){
 		      return this.ch;
 		    }
-		}
+		    public Cmd getCmd() {
+		    	return cmd;
+		    }
+	  }
 	  static Set<Character> cmdCharSet;
 	  static String cmdCharStr;
 	static Set<Character> cmdchset;
 	static Map<Character, Cmd> cmdKeyMap;
 	static {
 		cmdchset = new HashSet<Character>();
-		EnumSet.allOf(cmd.class).forEach(it -> cmdchset.add(it.getChar()));
+		EnumSet.allOf(cmdEnum.class).forEach(it -> cmdchset.add(it.getChar()));
 	}
 	public interface Cmd {
-		public void exec(List<Object> l);
+		public void exec(List<Object> l) throws TranshelpException;
 	}
-	class Void implements Cmd {
+	static class Void implements Cmd {
 		@Override
 		public void exec(List<Object> lst) {
 		}
 	}
-	class Reverse implements Cmd {
+	static class Reverse implements Cmd {
 		@Override
-		public void exec(List<Object> lst) {
-			boolean includes = false;
+		public void exec(List<Object> lst) throws TranshelpException {
+			boolean includes  = false;
 			for (Object it : lst) 
 				if (it instanceof Character) { // Character is command
 					includes = true;
@@ -49,7 +56,7 @@ public class Editor extends ArrayList<Object> {
 				}
 			if (!includes)
 				return;
-			RunCutter rc = new RunCutter(lst, cmd.REVERSE.getChar());
+			RunCutter rc = new RunCutter(lst, cmdEnum.REVERSE.getChar());
 			int[] pos_len;
 			try {
 				while ((pos_len = rc.get())!= null) {
@@ -57,35 +64,10 @@ public class Editor extends ArrayList<Object> {
 				}
 			}
 			catch (TranshelpException e) {
-				
+				throw new TranshelpException(e.getMessage() + " + improper grammer in Run.");
 			}
 		}
 		
-	}
-	Cmd keyToCmd(char cmd) {
-		switch(cmd) {
-		case '/':
-			return new Reverse();
-		}
-		return new Void();
-	}
-	public enum cmdKey {
-		REVERSE('/'),
-		THAT(':'),
-		;
-		public char key;
-		cmdKey(char key) {
-			this.key = key;
-		}		
-	}
-	Cmd cmdKeyToCmd(cmdKey ck) {
-		switch(ck) {
-		case REVERSE:
-			return new Reverse();
-		case THAT:
-			return new Void();
-		}
-		return new Void();
 	}
 	
 	/**
@@ -93,7 +75,7 @@ public class Editor extends ArrayList<Object> {
 	 * @author Yasukazu
 	 *
 	 */
-	class RunCutter {
+	static class RunCutter {
 		char sym;
 		List<Object> aa;
 		int pos;
@@ -160,6 +142,11 @@ public class Editor extends ArrayList<Object> {
 		}
 	}
 	char stopChar;
+	/**
+	 * Constructor
+	 * @param list
+	 * @param stop
+	 */
 	public Editor(List<Object> list, char stop) {
 		super(list);
 		stopChar = stop;
@@ -190,18 +177,21 @@ public class Editor extends ArrayList<Object> {
 		)
 		.collect(Collectors.toList()); */
 	}
-	public void recurEdit(cmdKey ck) {
+	public void recurEdit(cmdEnum ck) throws TranshelpException {
 		class Recur {
-			//cmdKey ck;
-			Cmd cmd;
-			Recur(cmdKey ck) {
-				//this.ck = ck;
-				cmd = cmdKeyToCmd(ck);//keyToCmd(ck.key);
+			cmdEnum ck;
+			Recur(cmdEnum ck) {
+				this.ck = ck;
 			}
-			void recurExec(List<Object> list, int nest) {
+			void recurExec(List<Object> list, int nest) throws TranshelpException {
 				enchar_cmd(list);
-				cmd.exec(list);
-				list.removeAll(Arrays.asList(ck.key));
+				try {
+				  ck.getCmd().exec(list);
+				}
+				catch (TranshelpException e) {
+					throw new TranshelpException(e.getMessage());
+				}				
+				list.removeAll(Arrays.asList(ck.getChar()));
 				for (Object item : list) {
 					if (item instanceof EnclosedArray) {
 						recurExec((EnclosedArray)item, nest + 1);
@@ -212,15 +202,19 @@ public class Editor extends ArrayList<Object> {
 				for (int i = 0; i < list.size(); ++i) {
 					Object it = list.get(i);
 					if (it instanceof String && ((String)it).length() == 1
-							&& ((String)it).charAt(0) == ck.key ) { //&& cmdchset.contains(((String)it).charAt(0))) {
-						char ch = ((String)it).charAt(0);
-						list.set(i, ch);
+							&& ( ((String)it).charAt(0) == ck.ch  || ((String)it).charAt(0) == ck.wch ) ){
+						list.set(i, ck.ch); // accept full-width command
 					}					
 				}
 			}
 		}
 		Recur rc = new Recur(ck);
-		rc.recurExec(this, 0);
+		try {
+			rc.recurExec(this, 0);
+		}
+		catch(TranshelpException e) {
+			throw new TranshelpException(e.getMessage());
+		}
 	}
 	/**
 	 * 
