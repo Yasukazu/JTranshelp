@@ -13,9 +13,17 @@ import java.text.Normalizer;
 
 @SuppressWarnings("serial")
 public class Transhelp extends ArrayList<HasStopString> {
+	enum spaceCharEnum {
+		SPC('\u0020'),
+		WSPC('\u3000'),
+		;
+		char ch;
+		spaceCharEnum(char ch){
+	      this.ch = ch;
+	    }
+	}
+	static EnumSet<spaceCharEnum> wideSpaceCharEnum = EnumSet.of(spaceCharEnum.WSPC);
   enum punct {
-	SPC('\u0020'),
-	WSPC('\u3000'),
     IDGCOMMA('\u3001'), //KUTEN \
 	IDGFSTOP('\u3002'), //TOUTEN o
     EXCL('!'),
@@ -31,7 +39,7 @@ public class Transhelp extends ArrayList<HasStopString> {
     WCOLON('\uFF1A'),
     WSEMI('\uFF1B'),
     ;
-    private char ch;
+    char ch;
     punct(char ch){
       this.ch = ch;
     }
@@ -40,23 +48,22 @@ public class Transhelp extends ArrayList<HasStopString> {
     }
 
   }
-  enum wpunct {
-		WSPC,
-		IDGFSTOP,
-	    IDGCOMMA,	  
-	    WEXCL,
-	    WQSTN,
-	    WCOMMA,
-	    WFLSTOP,
-	    WCOLON,
-	    WSEMI,
-	    ;
-  }
+  static EnumSet<punct> wPunctEnumSet = EnumSet.of(
+		punct.IDGFSTOP,
+		punct.IDGCOMMA,	  
+		punct.WEXCL,
+		punct.WQSTN,
+		punct.WCOMMA,
+		punct.WFLSTOP,
+		punct.WCOLON,
+		punct.WSEMI
+		);
+
 	static Set<Character> punctCharSet;
 	static String punctCharStr;
 	static {
 		punctCharSet = new HashSet<Character>();
-		EnumSet.allOf(punct.class).forEach(it -> punctCharSet.add(it.getChar()));
+		EnumSet.allOf(punct.class).forEach(it -> punctCharSet.add(it.ch));
 		StringBuilder sb = new StringBuilder();
 		for (Character ch : punctCharSet)
 			sb.append(ch);
@@ -71,14 +78,10 @@ public class Transhelp extends ArrayList<HasStopString> {
    */
   public Transhelp(List<String> lines){
 	super();
-    org_lines = lines;
-    nrm_lines = lines.stream()
-    .map(str -> {
-    	String nstr = Normalizer.normalize(str.trim(), Normalizer.Form.NFC);
-    	return nstr;
-    })
-	.collect(Collectors.toList());
-    addAll(getYsentence(nrm_lines));    
+	List<String> nlines = lines.stream()
+			.map(line -> Normalizer.normalize(line.trim(), Normalizer.Form.NFC))
+			.collect(Collectors.toList());
+    addAll(getYsentence(nlines));
   }
   
   public List<HasStopString> getSentences() {
