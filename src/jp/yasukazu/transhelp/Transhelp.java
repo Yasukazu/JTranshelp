@@ -14,7 +14,7 @@ import java.text.Normalizer;
 @SuppressWarnings("serial")
 public class Transhelp extends ArrayList<HasStopString> {
   enum punct {
-	  SPC('\u0020'),
+	SPC('\u0020'),
 	WSPC('\u3000'),
 	IDGFSTOP('\u3001'), //TOUTEN o
     IDGCOMMA('\u3002'), //KUTEN \
