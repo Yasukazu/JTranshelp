@@ -15,8 +15,8 @@ public class Editor extends ArrayList<Object> {
 			REVERSE('/', new Reverse(), '\uff0f'),
 		    ;
 		  Cmd cmd;	  
-		  private char ch;
-		  private char wch;
+		  char ch;
+		  char wch;
 		    cmdEnum(char ch, Cmd cmd, char wch){
 		      this.ch = ch;
 		      this.cmd = cmd;
@@ -35,7 +35,7 @@ public class Editor extends ArrayList<Object> {
 	static Map<Character, Cmd> cmdKeyMap;
 	static {
 		cmdchset = new HashSet<Character>();
-		EnumSet.allOf(cmdEnum.class).forEach(it -> cmdchset.add(it.getChar()));
+		EnumSet.allOf(cmdEnum.class).forEach(it -> cmdchset.add(it.ch));
 	}
 	public interface Cmd {
 		public void exec(List<Object> l) throws TranshelpException;
