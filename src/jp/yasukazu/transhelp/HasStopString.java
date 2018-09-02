@@ -1,6 +1,8 @@
 package jp.yasukazu.transhelp;
-
 import java.util.EnumSet;
+
+import jp.yasukazu.transhelp.Transhelp.punct;
+// 2018/8/31 : wide stop characters
 import java.util.HashSet;
 import java.util.Set;
 
@@ -10,24 +12,15 @@ import java.util.Set;
  *
  */
 public class HasStopString {
-	enum stopChars {
-	    KUTEN('\u3002'),
-	    QSTN('?'),
-	    EXCL('!'),
-	    FULL('.'),
-	    ;
-	    private char ch;
-	    stopChars(char ch){
-	      this.ch = ch;
-	    }
-	    public char getChar(){
-	      return this.ch;
-	    }		
-	}
-	static Set<Character> stopCharSet;
+	static EnumSet<punct> fullStopPunctSet = EnumSet.of(punct.WEXCL, punct.WFLSTOP, punct.WQSTN);
+	static Set<Character> fullStopCharSet;
+	static String fullStopCharStr;
 	static {
-		stopCharSet = new HashSet<Character>();
-		EnumSet.allOf(stopChars.class).forEach(it -> stopCharSet.add(it.ch));
+		StringBuilder sb = new StringBuilder();
+		fullStopPunctSet.forEach(sc -> sb.append(sc.ch));
+		fullStopCharStr = sb.toString();		
+		fullStopCharSet = new HashSet<Character>();
+		fullStopPunctSet.forEach(sc -> fullStopCharSet.add(sc.ch));
 	}
 
 	public static HasStopString toHasStopString(String str) {
@@ -35,7 +28,7 @@ public class HasStopString {
 		if (str.length() == 0)
 			return new HasStopString("", '\0');
 		char lastc = str.charAt(str.length() - 1);
-		if (!stopCharSet.contains(lastc))
+		if (!fullStopCharSet.contains(lastc))
 			return new HasStopString(str, '\0');			
 		return new HasStopString(str.substring(0, str.length() - 1), lastc);
 	}
@@ -45,11 +38,12 @@ public class HasStopString {
 		this.str = str;
 		this.stop = stop;
 	}
-	/*
+	
 	HasStopString(String str, boolean has_stop){
 		this.str = has_stop ? str.substring(0, str.length()-1) : str;
 		this.stop = has_stop ? str.charAt(str.length()-1) : 0;
-	}*/
+	}
+	
 	public String getStr() {
 		return this.str;
 	}
@@ -67,3 +61,4 @@ public class HasStopString {
 	}
 
 }
+
