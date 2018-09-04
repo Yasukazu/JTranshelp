@@ -2,10 +2,27 @@ package jp.yasukazu.transhelp;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import java.util.Map;
+
+import jp.yasukazu.transhelp.Transhelp.punct;
 
 @SuppressWarnings("serial")
 public class Enblock extends ArrayList<Object> {
+	static Set<Character> dlmSet;
+	static Map<Character,Character> dlmMap;
+	static {
+		dlmSet = new HashSet<Character>();
+		for(char ch : Editor.cmdCharSet)
+			dlmSet.add(ch);
+		dlmSet.add(punct.IDGCOMMA.ch);
+		dlmMap = new HashMap<Character,Character>(Editor.cmdCharMap);
+		dlmMap.put(punct.IDGCOMMA.ch, punct.IDGCOMMA.ch);
+	}
 
 	public Enblock(String txt) throws TranshelpException {
 		super();
@@ -81,64 +98,66 @@ public class Enblock extends ArrayList<Object> {
 		}
 		return "";
 	}
-	
-	public static List<String> sentence_split(String st) throws TranshelpException {
-		List<String> stack = new ArrayList<String>();
-		StringBuilder buff = new StringBuilder();
-		String dlmrx = "[\\s" + Transhelp.spaceCharEnum.WSPC + "]+";
-		int pos = 0;
-		while (pos < st.length()) {
-			char ch = st.charAt(pos);
-			Enblock.bracketPair pair = Enblock.getPair(ch); 
-			if (pair != Enblock.bracketPair.NUL) {
-				if (buff.length() > 0 && buff.toString().trim().length() > 0) {
-					stack.addAll(new ArrayList<String>(Arrays.asList(buff.toString().split(dlmrx))));
-					buff.setLength(0);
-				}
-				if (pos + 1 >= st.length())
-					return stack;
-				String nst = st.substring(pos + 1);
-				try {
-					String n2st = Enblock.bracket_content(nst, pair);
-					if (n2st.length() > 0) {
-						stack.add(pair.getBegin() + n2st + pair.getEnd());
-						pos += n2st.length() + 1;
-					}
-					else {
-						stack.add(pair.getBegin() + nst + pair.getEnd());
-						return stack;
-					}
-				}
-				catch (TranshelpException e) {
-					throw new TranshelpException("bracket_content:" + nst);
-				}
-			}
-			else
-				buff.append(ch);
-			pos += 1;
-		}
-		if (buff.length() > 0 && buff.toString().trim().length() > 0)
-			stack.addAll(new ArrayList<String>(Arrays.asList(buff.toString().split(dlmrx))));
-		return stack;
+	public static String en_paren(String s) {
+		return '(' + s + ')';
+	}
+	public static String rgx_remaining(char ch) {
+		return String.format("(?<=%1s)|(?=%1s)", ch, ch);
+	}
+	public static String rgx_command(char ch) {
+		return String.format("(?<=%1s)|(?=%1s)", ch, ch);
+	}
+	public static String rgx_multi_remaining(char... elel) {
+		StringBuilder sb = new StringBuilder();
+		for (char elm : elel)
+			sb.append(rgx_remaining(elm));
+		return sb.toString();
+	}
+	public static String rgx_set_remaining(Set<Character> set) {
+		StringBuilder sb = new StringBuilder();
+		for (char elm : set)
+			sb.append(rgx_remaining(elm));
+		return sb.toString();
 	}
 	
 	public static List<Object> load(String st) throws TranshelpException {
 		return _load(st, 0);
 	}
+
 	
+	static String spc_dlmrx = "[\\s" + Transhelp.spaceCharEnum.WSPC.ch + "]+";
+	static String idgcomma_dlmrx = '(' + rgx_remaining(punct.IDGCOMMA.ch) + ')'; 
+	static String dlmrx = String.join("|", en_paren(spc_dlmrx), en_paren(idgcomma_dlmrx));//, en_paren(rgx_set_remaining(Editor.cmdCharSet)));
+	static List<Object> dlmrx_convert(StringBuilder buff) {
+		List<Object> rList = new ArrayList<>();
+		for (String tk : Arrays.asList(buff.toString().split(dlmrx))) {
+			if (tk.length() == 1) {
+				char ch = tk.charAt(0);
+				if (ch == punct.IDGCOMMA.ch)
+					rList.add(ch);
+				else if (Editor.cmdCharSet.contains(ch))
+					rList.add(Editor.charCmdEnumMap.get(ch));
+				else
+					rList.add(tk);
+			}
+			else
+				rList.add(tk);
+		}
+		return rList;
+	}
 	static List<Object> _load(String st, int level) throws TranshelpException {
 		if (level > MAX_NEST) {
 			throw new TranshelpException("Too deep nest!");
 		}
 		List<Object> stack = new ArrayList<>();
 		StringBuilder buff = new StringBuilder();
-		String dlmrx = "[\\s" + Transhelp.spaceCharEnum.WSPC + "]+";		
+		//String dlmrx = "[\\s" + Transhelp.spaceCharEnum.WSPC.ch + "]+";		
 		for (int pos = 0; pos < st.length(); ++pos) {
 			char ch = st.charAt(pos);
 			Enblock.bracketPair pair = Enblock.getPair(ch); 
 			if (pair != Enblock.bracketPair.NUL) {
 				if (buff.length() > 0 && buff.toString().trim().length() > 0) {
-					stack.addAll(new ArrayList<String>(Arrays.asList(buff.toString().split(dlmrx))));
+					stack.addAll(dlmrx_convert(buff));
 					buff.setLength(0);
 				}
 				if (pos + 1 >= st.length())
@@ -163,10 +182,8 @@ public class Enblock extends ArrayList<Object> {
 				buff.append(ch);
 			}			
 		}
-		if (buff.length() > 0 && buff.toString().trim().length() > 0) {
-			for(String str : buff.toString().split(dlmrx))  
-				stack.add(str);
-		}
+		if (buff.length() > 0 && buff.toString().trim().length() > 0) 
+			stack.addAll(dlmrx_convert(buff));
 		return stack;
 	}
 		
