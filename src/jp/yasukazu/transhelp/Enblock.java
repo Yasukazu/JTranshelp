@@ -134,7 +134,7 @@ public class Enblock extends ArrayList<Object> {
 			if (tk.length() == 1) {
 				char ch = tk.charAt(0);
 				if (ch == punct.IDGCOMMA.ch)
-					rList.add(ch);
+					rList.add(punct.IDGCOMMA);
 				else if (Editor.cmdCharSet.contains(ch))
 					rList.add(Editor.charCmdEnumMap.get(ch));
 				else
