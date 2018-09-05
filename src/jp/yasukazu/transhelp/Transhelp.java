@@ -110,13 +110,13 @@ public class Transhelp extends ArrayList<HasStopString> {
    */
   public List<Editor> editAll() throws TranshelpException {
 	  List<Editor> editorList = new ArrayList<Editor> ();
-	try {
-	  for(HasStopString snt : this) {
+	  try {
+		  for(HasStopString snt : this) {
 				Enblock block = new Enblock(snt.str);
 			  Editor edt = new Editor(block, snt.stop);
-			  edt.recurEdit(Editor.cmdEnum.REVERSE); //do_reverse();
-			  editorList.add(edt);
-	  }
+				  edt.recurEdit(Editor.cmdEnum.REVERSE); //do_reverse();
+				  editorList.add(edt);
+			  }
 		}
 		catch (TranshelpException e) {
 			throw new TranshelpException("Improper grammer: " + e.getMessage());
