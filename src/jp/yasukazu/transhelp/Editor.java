@@ -3,7 +3,6 @@ package jp.yasukazu.transhelp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,10 +12,11 @@ import jp.yasukazu.transhelp.Transhelp.punct;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 
 @SuppressWarnings("serial")
 public class Editor extends ArrayList<Object> {
-	  enum cmdEnum {
+	  public enum cmdEnum {
 			REVERSE('/', new Reverse(), '\uff0f'),
 		    ;
 		  Cmd cmd;	  
@@ -76,7 +76,9 @@ public class Editor extends ArrayList<Object> {
 			int[] pos_len;
 			try {
 				while ((pos_len = rc.get())!= null) {
-					Collections.reverse(lst.subList(pos_len[0], pos_len[0] + pos_len[1]));
+					List<Object> sub_list = lst.subList(pos_len[0], pos_len[0] + pos_len[1]);
+					sub_list.remove(ce);
+					Collections.reverse(sub_list);
 				}
 			}
 			catch (TranshelpException e) {
@@ -91,7 +93,66 @@ public class Editor extends ArrayList<Object> {
 	 * @author Yasukazu
 	 *
 	 */
-	static class RunCutter {
+	public static class RunIter implements Iterator<List<Object>>, Iterable<List<Object>> {
+		cmdEnum sym;
+		LinkedList<Object> queue;
+		public RunIter(List<Object> aa, cmdEnum sym) {
+			this.sym = sym;
+			this.queue = new LinkedList<Object>(aa);
+		}
+		
+		boolean ispat(List<Object> aa) {
+			if (aa.size() < 2)
+				return false;
+			if (aa.get(0) instanceof cmdEnum && (cmdEnum)aa.get(0) == sym && !(aa.get(1) instanceof cmdEnum))
+				return true;
+			return false;
+		}
+		
+
+		@Override
+		public Iterator<List<Object>> iterator() {
+			return this;
+		}
+
+		@Override
+		public boolean hasNext() {
+			return queue != null;
+		}
+
+		@Override
+		public List<Object> next() {
+			List<Object> rList;
+			if (queue.size() == 0) // sliced() == null)
+				return null;
+			int ps;
+			if (queue.size() < 3 || (ps = queue.indexOf(sym)) < 0)  {
+				rList = queue;
+				queue = null;
+				return rList;
+			}			
+			if (ps == 0)
+				throw new TranshelpError("No item before " + sym);
+			if (ps == queue.size()-1)
+				throw new TranshelpError("Ends with " + sym);
+			if (ps > 1) {
+				rList = new ArrayList<Object>(queue.subList(0, ps - 1));
+				while (ps-- > 1) {
+					queue.poll(); // drop
+				}
+				return rList;
+			}
+			rList = new ArrayList<Object>();
+			rList.add(queue.poll());
+			while (ispat(queue)) {
+				rList.add(queue.poll());
+				rList.add(queue.poll());			
+			}
+			return rList;
+		}
+	}
+
+	static class RunCutter  {
 		cmdEnum sym;
 		List<Object> aa;
 		int pos;
@@ -156,7 +217,11 @@ public class Editor extends ArrayList<Object> {
 		List<Object> sliced() {		
 			return pos < aa.size() ? aa.subList(pos, aa.size()) : null; 
 		}
+
 	}
+	
+	
+	
 	char stopChar;
 	/**
 	 * Constructor
@@ -187,7 +252,7 @@ public class Editor extends ArrayList<Object> {
 		}
 	}
 	
-	public static Iterable<List<Object>> idgcommaSplitAllocIter(List<Object> list) {
+	public static Iterable<List<Object>> idgcommaSplitIter(List<Object> list) {
 		class EnumIdgComma implements Iterable<List<Object>>, Iterator<List<Object>> {
 			List<Object> list;
 			int cur;
@@ -214,12 +279,12 @@ public class Editor extends ArrayList<Object> {
 					if (obj instanceof punct && ((punct)obj) == punct.IDGCOMMA) {
 						rList = list.subList(cur, idx);
 						cur = idx + 2;
-						return new ArrayList<Object>(rList);
+						return rList;
 					}
 				}
     			rList = list.subList(cur, size);
 	  			cur = size;
-				return new ArrayList<Object>(rList);
+				return rList;
 			}
 
 			@Override
@@ -273,24 +338,24 @@ public class Editor extends ArrayList<Object> {
 			}
 			void recurExec(List<Object> lst, int nest) throws TranshelpException {
 				List<List<Object>> tmpList = new ArrayList<>();
-				List<List<Object>> allocList = idgcommaSplitAlloc(lst);
-				for (int i = 0; i < allocList.size(); ++i) {
-					List<Object> list = allocList.get(i);
+				for (List<Object> list : idgcommaSplitAlloc(lst)) {
+				//for (int i = 0; i < allocList.size(); ++i) {
+					//List<Object> list = allocList.get(i);
 					if (list.contains(ck))
 						try {
-						    ck.cmd.exec(list, ck);
-							for (int j = 0; j < list.size(); ++j) {
-								Object it = list.get(j);
+							List<Object> aList = new ArrayList<>(list);
+						    ck.cmd.exec(aList, ck);
+							for (Object it : aList) {
 								if (it instanceof EnclosedArray) {
 									recurExec((EnclosedArray)it, nest + 1);
 								}			
 							}
-							list.remove(ck);
+							//list.remove(ck);
+							tmpList.add(aList);
 						}
 						catch (TranshelpException e) {
 							throw new TranshelpException(e.getMessage());
 						}
-					tmpList.add(list);
 				}
 				lst.clear();
 				int tmpList_size = tmpList.size();
