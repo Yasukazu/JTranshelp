@@ -1,6 +1,7 @@
 package jp.yasukazu.transhelp;
 // 2018/8/30 YtM @ yasukazu.jp
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -71,19 +72,24 @@ public class Editor extends ArrayList<Object> {
 	static class Reverse implements Cmd {
 		@Override
 		public void exec(List<Object> lst, cmdEnum ce) throws TranshelpException {
-
-			RunCutter rc = new RunCutter(lst, ce);//cmdEnum.REVERSE.ch);
-			int[] pos_len;
+			List<Object> nList = new ArrayList<>();
 			try {
-				while ((pos_len = rc.get())!= null) {
-					List<Object> sub_list = lst.subList(pos_len[0], pos_len[0] + pos_len[1]);
-					sub_list.remove(ce);
-					Collections.reverse(sub_list);
+				for (List<Object> list : new RunIter(lst, ce)) {
+					if (list.contains(ce)) {
+						List<Object> aList = new ArrayList<>(list);
+						Collections.reverse(aList);
+						aList.remove(ce);
+						nList.addAll(aList);
+					}
+					else
+						nList.addAll(list);
 				}
 			}
-			catch (TranshelpException e) {
-				throw new TranshelpException(e.getMessage() + " + improper grammer in Run.");
+			catch(TranshelpError e) {
+				throw new TranshelpException("Error in Reverse: " + e.getMessage());
 			}
+			lst.clear();
+			lst.addAll(nList);
 		}
 		
 	}
@@ -91,12 +97,12 @@ public class Editor extends ArrayList<Object> {
 	/**
 	 * get run [B op C] from [A B op C D]
 	 * @author Yasukazu
-	 *
+	 * @next() 
 	 */
-	public static class RunIter implements Iterator<List<Object>>, Iterable<List<Object>> {
+	static class RunIter implements Iterator<List<Object>>, Iterable<List<Object>> {
 		cmdEnum sym;
 		LinkedList<Object> queue;
-		public RunIter(List<Object> aa, cmdEnum sym) {
+		RunIter(List<Object> aa, cmdEnum sym) {
 			this.sym = sym;
 			this.queue = new LinkedList<Object>(aa);
 		}
@@ -117,38 +123,38 @@ public class Editor extends ArrayList<Object> {
 
 		@Override
 		public boolean hasNext() {
-			return queue != null;
+			return queue.size() > 0;
 		}
 
 		@Override
 		public List<Object> next() {
 			List<Object> rList;
-			if (queue.size() == 0) // sliced() == null)
-				return null;
 			int ps;
 			if (queue.size() < 3 || (ps = queue.indexOf(sym)) < 0)  {
-				rList = queue;
-				queue = null;
+				rList = new ArrayList<Object>(queue);
+				queue.clear();;
 				return rList;
-			}			
-			if (ps == 0)
-				throw new TranshelpError("No item before " + sym);
+			}	
 			if (ps == queue.size()-1)
 				throw new TranshelpError("Ends with " + sym);
-			if (ps > 1) {
+			switch (ps) {
+			case 0: //if (ps == 0)
+				throw new TranshelpError("No item before " + sym);
+			case 1:
+				rList = new ArrayList<Object>();
+				rList.add(queue.poll());
+				while (ispat(queue)) {
+					rList.add(queue.poll());
+					rList.add(queue.poll());			
+				}
+				return rList;
+			default: //			if (ps > 1) {
 				rList = new ArrayList<Object>(queue.subList(0, ps - 1));
 				while (ps-- > 1) {
 					queue.poll(); // drop
 				}
 				return rList;
 			}
-			rList = new ArrayList<Object>();
-			rList.add(queue.poll());
-			while (ispat(queue)) {
-				rList.add(queue.poll());
-				rList.add(queue.poll());			
-			}
-			return rList;
 		}
 	}
 
@@ -338,30 +344,29 @@ public class Editor extends ArrayList<Object> {
 			}
 			void recurExec(List<Object> lst, int nest) throws TranshelpException {
 				List<List<Object>> tmpList = new ArrayList<>();
-				for (List<Object> list : idgcommaSplitAlloc(lst)) {
-				//for (int i = 0; i < allocList.size(); ++i) {
-					//List<Object> list = allocList.get(i);
-					if (list.contains(ck))
+				for (List<Object> cList : idgcommaSplitAlloc(lst)) {
+					if (cList.contains(ck)) {
+						List<Object> aList = new ArrayList<>(cList);
 						try {
-							List<Object> aList = new ArrayList<>(list);
 						    ck.cmd.exec(aList, ck);
 							for (Object it : aList) {
 								if (it instanceof EnclosedArray) {
 									recurExec((EnclosedArray)it, nest + 1);
 								}			
 							}
-							//list.remove(ck);
-							tmpList.add(aList);
 						}
 						catch (TranshelpException e) {
 							throw new TranshelpException(e.getMessage());
 						}
+						tmpList.add(aList);
+					}
+					else
+						tmpList.add(cList);
 				}
 				lst.clear();
 				int tmpList_size = tmpList.size();
 				for (int i = 0; i < tmpList_size; ++i) {
 					List<Object> iList = tmpList.get(i);
-					//iList.remove(ck);
 					lst.addAll(iList);
 					if (i < tmpList_size - 1)
 						lst.add(punct.IDGCOMMA);						
@@ -410,4 +415,19 @@ public class Editor extends ArrayList<Object> {
 		ts.recur(this);
 		return ts.toStr();
 	}
+
+	  public static void main(String[] args) {
+		  List<Object> run_iter_sample = new ArrayList<>();
+		  run_iter_sample.addAll(Arrays.asList("a b".split(" ")));
+		  run_iter_sample.add(Editor.cmdEnum.REVERSE);
+		  run_iter_sample.addAll(Arrays.asList("cd".split(" ")));
+		  run_iter_sample.add(Editor.cmdEnum.REVERSE);
+		  run_iter_sample.addAll(Arrays.asList("e f".split(" ")));
+		  Editor.RunIter run_iter = new Editor.RunIter(run_iter_sample, Editor.cmdEnum.REVERSE);
+		  List<List<Object>> output_list = new ArrayList<>();
+		  for (List<Object> part_list : run_iter) {
+			  output_list.add(part_list);
+		  }
+		  System.out.println(output_list.size());
+	  }
 }
