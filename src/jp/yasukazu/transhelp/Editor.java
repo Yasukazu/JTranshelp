@@ -132,7 +132,7 @@ public class Editor extends ArrayList<Object> {
 			int ps;
 			if (queue.size() < 3 || (ps = queue.indexOf(sym)) < 0)  {
 				rList = new ArrayList<Object>(queue);
-				queue.clear();;
+				queue.clear();
 				return rList;
 			}	
 			if (ps == queue.size()-1)
@@ -158,75 +158,6 @@ public class Editor extends ArrayList<Object> {
 		}
 	}
 
-	static class RunCutter  {
-		cmdEnum sym;
-		List<Object> aa;
-		int pos;
-		RunCutter(List<Object> aa, cmdEnum sym) {
-			this.sym = sym;
-			this.aa = new ArrayList<Object>(aa);
-			this.pos = 0;
-		}
-		
-		/**
-		 * is pattern
-		 * @param aa
-		 * @return
-		 */
-		boolean ispat(List<Object> aa) throws TranshelpException {
-			if (aa.size() < 2)
-				return false;
-			if (!(aa.get(0) instanceof cmdEnum) || ((cmdEnum)aa.get(0)) != sym)
-				return false;			
-			if ((aa.get(1) instanceof cmdEnum) && ((cmdEnum)aa.get(1)) == sym)
-				throw new TranshelpException("Duplicating:" + sym);
-			return true;
-		}
-		
-		/**
-		 * 
-		 * @return int[] (but null if error) of Position and Run-length
-		 * @throws TranshelpException 
-		 */
-		int[] get() throws TranshelpException {
-			if (sliced() == null || sliced().size() < 3)
-				return null;
-			int ps = sliced().indexOf(sym);
-			if (ps < 0)
-				return null;
-			if (ps == 0 && pos == 0)
-				throw new TranshelpException("No item before " + sym);
-			if (ps == sliced().size()-1)
-				throw new TranshelpException("Ends with " + sym);
-			List<Object> subslice = sliced().subList(ps, sliced().size());					
-			int prcd = 0; // proceed			
-			for (Object lastObj = subslice.get(prcd++); prcd < subslice.size(); ++prcd) {
-				Object obj = subslice.get(prcd);
-				if (lastObj instanceof cmdEnum) {
-					if (obj instanceof cmdEnum && (cmdEnum)obj == sym)
-						throw new TranshelpException("Duplicating same Operator " + sym);
-				}
-				else
-					if (!(obj instanceof cmdEnum) || (cmdEnum)obj != sym) 
-						break;
-				lastObj = obj;
-			}
-			int[] rvs = {pos + ps - 1, prcd + 1};
-			pos += ps + prcd;
-			return rvs;
-		}
-						
-		/**
-		 * 
-		 * @return : view of subList starting pos but null if unavailable
-		 */
-		List<Object> sliced() {		
-			return pos < aa.size() ? aa.subList(pos, aa.size()) : null; 
-		}
-
-	}
-	
-	
 	
 	char stopChar;
 	/**
@@ -346,10 +277,10 @@ public class Editor extends ArrayList<Object> {
 				List<List<Object>> tmpList = new ArrayList<>();
 				for (List<Object> cList : idgcommaSplitAlloc(lst)) {
 					if (cList.contains(ck)) {
-						List<Object> aList = new ArrayList<>(cList);
+						//List<Object> aList = new ArrayList<>(cList);
 						try {
-						    ck.cmd.exec(aList, ck);
-							for (Object it : aList) {
+						    ck.cmd.exec(cList, ck);
+							for (Object it : cList) {
 								if (it instanceof EnclosedArray) {
 									recurExec((EnclosedArray)it, nest + 1);
 								}			
@@ -358,7 +289,7 @@ public class Editor extends ArrayList<Object> {
 						catch (TranshelpException e) {
 							throw new TranshelpException(e.getMessage());
 						}
-						tmpList.add(aList);
+						tmpList.add(cList);
 					}
 					else
 						tmpList.add(cList);
