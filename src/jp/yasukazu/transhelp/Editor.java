@@ -189,51 +189,51 @@ public class Editor extends ArrayList<Object> {
 		}
 	}
 	
-	public static Iterable<List<Object>> idgcommaSplitIter(List<Object> list) {
-		class EnumIdgComma implements Iterable<List<Object>>, Iterator<List<Object>> {
-			List<Object> list;
-			int cur;
-			int size;
-			EnumIdgComma(List<Object> list) {
-				this.list = list;
-				cur = 0;
-				this.size = list.size();
-			}
-
-			@Override
-			public boolean hasNext() {
-				return cur < size;
-			}
-
-			@Override
-			public List<Object> next() {
-				if (!hasNext())
-					return null;
-				List<Object> rList;
-				int idx = cur;
-				for (; idx < size; ++idx) {
-					Object obj = list.get(idx);
-					if (obj instanceof punct && ((punct)obj) == punct.IDGCOMMA) {
-						rList = list.subList(cur, idx);
-						cur = idx + 2;
-						return rList;
-					}
-				}
-    			rList = list.subList(cur, size);
-	  			cur = size;
-				return rList;
-			}
-
-			@Override
-			public Iterator<List<Object>> iterator() {
-				return this;
-			}
-		
+	class IterIdgComma implements Iterable<List<Object>>, Iterator<List<Object>> {
+		List<Object> list;
+		int cur;
+		int size;
+		IterIdgComma(List<Object> list) {
+			this.list = list;
+			cur = 0;
+			this.size = list.size();
 		}
-		return new EnumIdgComma(list);
+
+		@Override
+		public boolean hasNext() {
+			return cur < size;
+		}
+
+		@Override
+		public List<Object> next() {
+			if (!hasNext())
+				return list.subList(cur, size); // empty sublist
+			List<Object> rList;
+			int idx = cur;
+			for (; idx < size; ++idx) {
+				Object obj = list.get(idx);
+				if (obj == punct.IDGCOMMA) {
+					rList = list.subList(cur, idx);
+					cur = idx + 2;
+					return rList;
+				}
+			}
+			rList = list.subList(cur, size);
+			cur = size;
+			return rList;
+		}
+
+		@Override
+		public Iterator<List<Object>> iterator() {
+			return this;
+		}
+
+	}
+	Iterable<List<Object>> idgcommaSplitIter(List<Object> list) {
+		return new IterIdgComma(list);
 	}
 	
-	public static List<List<Object>> idgcommaSplit(List<Object> list) {
+	static List<List<Object>> idgcommaSplit(List<Object> list) {
 		List<List<Object>> rList = new ArrayList<>();
 		int idx = 0;
 		do {
@@ -275,12 +275,12 @@ public class Editor extends ArrayList<Object> {
 			}
 			void recurExec(List<Object> lst, int nest) throws TranshelpException {
 				List<List<Object>> tmpList = new ArrayList<>();
-				for (List<Object> cList : idgcommaSplitAlloc(lst)) {
-					if (cList.contains(ck)) {
-						//List<Object> aList = new ArrayList<>(cList);
+				for (List<Object> split : idgcommaSplit(lst)) {
+					List<Object> asplit = new ArrayList<>(split);
+					if (split.contains(ck)) {
 						try {
-						    ck.cmd.exec(cList, ck);
-							for (Object it : cList) {
+						    ck.cmd.exec(asplit, ck);
+							for (Object it : asplit) {
 								if (it instanceof EnclosedArray) {
 									recurExec((EnclosedArray)it, nest + 1);
 								}			
@@ -289,10 +289,8 @@ public class Editor extends ArrayList<Object> {
 						catch (TranshelpException e) {
 							throw new TranshelpException(e.getMessage());
 						}
-						tmpList.add(cList);
 					}
-					else
-						tmpList.add(cList);
+					tmpList.add(asplit);
 				}
 				lst.clear();
 				int tmpList_size = tmpList.size();
@@ -300,7 +298,7 @@ public class Editor extends ArrayList<Object> {
 					List<Object> iList = tmpList.get(i);
 					lst.addAll(iList);
 					if (i < tmpList_size - 1)
-						lst.add(punct.IDGCOMMA);						
+						lst.add(punct.IDGCOMMA);
 				}
 				
 			}
