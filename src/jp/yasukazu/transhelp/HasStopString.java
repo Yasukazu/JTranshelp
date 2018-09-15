@@ -12,15 +12,16 @@ import java.util.Set;
  *
  */
 public class HasStopString {
-	static EnumSet<punct> fullStopPunctSet = EnumSet.of(punct.WEXCL, punct.WFLSTOP, punct.WQSTN);
+	static EnumSet<punct> fullStopPunctSet = EnumSet.of(punct.WEXCL, punct.WFLSTOP, punct.IDGFSTOP, punct.WQSTN);
 	static Set<Character> fullStopCharSet;
 	static String fullStopCharStr;
 	static {
 		StringBuilder sb = new StringBuilder();
 		fullStopPunctSet.forEach(sc -> sb.append(sc.ch));
 		fullStopCharStr = sb.toString();		
-		fullStopCharSet = new HashSet<Character>();
+		fullStopCharSet = new HashSet<>();
 		fullStopPunctSet.forEach(sc -> fullStopCharSet.add(sc.ch));
+		fullStopCharSet.remove(punct.WFLSTOP.ch);
 	}
 
 	public static HasStopString toHasStopString(String str) {
