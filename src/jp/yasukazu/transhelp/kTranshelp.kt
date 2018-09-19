@@ -1,6 +1,7 @@
 package jp.yasukazu.transhelp
 
 // 2018/8/31 YtM @yasukazu.jp
+import java.io.InputStream
 import java.util.ArrayList
 import java.util.EnumSet
 import java.util.HashSet
@@ -8,8 +9,8 @@ import java.util.LinkedList
 
 import java.text.Normalizer
 import kotlin.streams.toList
-
-class KTranshelp
+import jp.yasukazu.transhelp.HasStopString2 as HasStopString
+class TransHelp
 //List<HasStopString> sentences;
 /**
  * Constructor
@@ -59,7 +60,7 @@ class KTranshelp
     internal fun stop_split(line: String): List<HasStopString> {
         val rgx_dlms = "(?<=[" + punctEnum.IDGFSTOP.ch + "])"
         val lines = line.split(rgx_dlms.toRegex())
-        return lines.map { ln -> HasStopString.toHasStopString(ln) }
+        return lines.map(HasStopString.Companion::toHasStopString)
     }
 
     /**
@@ -98,7 +99,7 @@ class KTranshelp
 
         internal var punctCharSet: MutableSet<Char>
         internal var punctCharStr: String
-
+        var usageStream: InputStream
         init {
             punctCharSet = HashSet()
             EnumSet.allOf(punctEnum::class.java).forEach { it -> punctCharSet.add(it.ch) }
@@ -106,6 +107,13 @@ class KTranshelp
             for (ch in punctCharSet)
                 sb.append(ch)
             punctCharStr = sb.toString()
+
+            val thisClass = this::class
+            val javaClass = this.javaClass
+            val usageFilename = "USAGE.md"
+            val jClass = thisClass.java
+            usageStream = jClass.getResourceAsStream(usageFilename)
+
         }
     }
 
