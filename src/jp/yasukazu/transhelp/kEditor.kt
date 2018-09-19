@@ -2,11 +2,10 @@ package jp.yasukazu.transhelp
 
 import java.util.ArrayList
 import java.util.Arrays
-import java.util.Collections
 import java.util.EnumSet
 import java.util.HashMap
 
-import jp.yasukazu.transhelp.KTranshelp.punctEnum
+import jp.yasukazu.transhelp.TransHelp.punctEnum
 
 import java.util.HashSet
 import java.util.LinkedList
@@ -51,14 +50,14 @@ class Editor2
         override fun exec(lst: MutableList<Any>, ce: cmdEnum) {
             val nList = mutableListOf<Any>()
             try {
-                for (list in RunIter(lst, ce)) {
-                    if (list.contains(ce)) {
-                        val aList = mutableListOf<Any>(list)
-                        aList.reverse() // Collections.reverse(aList)
-                        aList.remove(ce)
-                        nList.addAll(aList)
+                for (run in RunIter(lst, ce)) {
+                    if (run.contains(ce)) {
+                        val ran = run.toMutableList()//mutableListOf<Any>(run)
+                        ran.reverse() // Collections.reverse(aList)
+                        ran.remove(ce)
+                        nList.addAll(ran)
                     } else
-                        nList.addAll(list)
+                        nList.addAll(run)
                 }
             } catch (e: TranshelpError) {
                 throw TranshelpException("Error in Reverse: " + e.message)
@@ -200,8 +199,8 @@ class Editor2
             fun recurExec(lst: MutableList<Any>, nest: Int) {
                 val tmpList = ArrayList<List<Any>>()
                 for (split in idgCommaSplit(lst)) {
-                    val asplit = mutableListOf<Any>(split)
                     if (split.contains(ck)) {
+                        val asplit = split.toMutableList()//mutableListOf<Any>(*split)
                         try {
                             ck.cmd.exec(asplit, ck)
                             for (it in asplit) {
@@ -212,9 +211,10 @@ class Editor2
                         } catch (e: TranshelpException) {
                             throw TranshelpException(e.message)
                         }
-
+                        tmpList.add(asplit)
                     }
-                    tmpList.add(asplit)
+                    else
+                        tmpList.add(split)
                 }
                 lst.clear()
                 val tmpList_size = tmpList.size
