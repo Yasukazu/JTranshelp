@@ -216,15 +216,17 @@ class Editor2
                     else
                         tmpList.add(split)
                 }
-                lst.clear()
+                val lst2 = ArrayList<Any>()
+                //lst.clear()
                 val tmpList_size = tmpList.size
                 for (i in 0 until tmpList_size) {
-                    val iList = tmpList[i]
-                    lst.addAll(iList)
+                    //val iList = tmpList[i]
+                    lst2.addAll(tmpList[i])//addAll(tmpList[i])
                     if (i < tmpList_size - 1)
-                        lst.add(punctEnum.IDGCOMMA)
+                        lst2.add(punctEnum.IDGCOMMA)
                 }
-
+                lst.clear()
+                lst.addAll(lst2)
             }
         }
 
@@ -248,7 +250,7 @@ class Editor2
             fun recur(stack: List<Any>) {
                 for (obj in stack) {
                     if (obj is EnclosedArray2) {
-                        val print = obj.pair == EnBlock.BracketPair.BRACKET
+                        val print = obj.pair != EnBlock.BracketPair.NUL
                         if (print)
                             bldr.append(obj.begin)
                         recur(obj)
