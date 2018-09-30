@@ -1,24 +1,25 @@
 package jp.yasukazu.transhelp;
 
+import jp.yasukazu.transhelp.Enblock.bracketPair;
 import java.util.ArrayList;
 import java.util.List;
 
 public class EnclosedArray extends ArrayList<Object> {
 	private static final long serialVersionUID = 1002001L;
-	Enblock.bracketPair pair;
-	public EnclosedArray(List<Object> list, Enblock.bracketPair pair) {
+	bracketPair pair;
+	public EnclosedArray(List<Object> list, bracketPair pair) {
 		super(list);
 		this.pair = pair;
 	}
 	public EnclosedArray(List<Object> ary) {
 		super(ary);
-		this.pair = Enblock.bracketPair.NUL;
+		this.pair = bracketPair.NUL;
 	}
 	public EnclosedArray() {
 		super();
-		this.pair = Enblock.bracketPair.NUL;
+		this.pair = bracketPair.NUL;
 	}
-	public Enblock.bracketPair getPair() {
+	public bracketPair getPair() {
 		return pair;
 	}
 	public char getBegin() {
@@ -28,13 +29,13 @@ public class EnclosedArray extends ArrayList<Object> {
 		return getPair().getEnd();
 	}
 	public void insert() {
-		if (pair != Enblock.bracketPair.NUL) {
+		if (pair != bracketPair.NUL) {
 			this.add(0, "" + pair.getBegin());
 			this.add("" + pair.getEnd());
-			pair = Enblock.bracketPair.NUL;
+			pair = bracketPair.NUL;
 		}
 	}
-	public void setPair(Enblock.bracketPair pair) {
+	public void setPair(bracketPair pair) {
 		this.pair = pair;
 	}
 }

@@ -1,7 +1,6 @@
 package jp.yasukazu.transhelp;
 import java.util.EnumSet;
 
-import jp.yasukazu.transhelp.Transhelp.punct;
 // 2018/8/31 : wide stop characters
 import java.util.HashSet;
 import java.util.Set;
@@ -12,16 +11,16 @@ import java.util.Set;
  *
  */
 public class HasStopString {
-	static EnumSet<punct> fullStopPunctSet = EnumSet.of(punct.WEXCL, punct.WFLSTOP, punct.IDGFSTOP, punct.WQSTN);
+	static EnumSet<punctEnum> fullStopPunctSet = EnumSet.of(punctEnum.WEXCL, punctEnum.WFLSTOP, punctEnum.IDGFSTOP, punctEnum.WQSTN);
 	static Set<Character> fullStopCharSet;
 	static String fullStopCharStr;
 	static {
 		StringBuilder sb = new StringBuilder();
-		fullStopPunctSet.forEach(sc -> sb.append(sc.ch));
+		fullStopPunctSet.forEach(sb::append);
 		fullStopCharStr = sb.toString();		
 		fullStopCharSet = new HashSet<>();
 		fullStopPunctSet.forEach(sc -> fullStopCharSet.add(sc.ch));
-		fullStopCharSet.remove(punct.WFLSTOP.ch);
+		fullStopCharSet.remove(punctEnum.WFLSTOP.ch);
 	}
 
 	public static HasStopString toHasStopString(String str) {

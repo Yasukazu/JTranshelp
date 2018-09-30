@@ -1,7 +1,6 @@
 package jp.yasukazu.transhelp;
 // 2018/8/30 YtM @ yasukazu.jp
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -10,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import jp.yasukazu.transhelp.Transhelp.punct;
-
+import jp.yasukazu.transhelp.Enblock.bracketPair;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -322,7 +321,7 @@ public class Editor extends ArrayList<Object> {
 			void recur(List<Object> stack) {
 				for (Object obj : stack) {
 					if (obj instanceof EnclosedArray) {
-						boolean print = ((EnclosedArray)obj).getPair() != Enblock.bracketPair.BRACKET;
+						boolean print = ((EnclosedArray)obj).getPair() != bracketPair.BRACKET;
 						if (print)
 							bldr.append(((EnclosedArray)obj).getBegin());
 						recur((EnclosedArray)obj);
@@ -345,18 +344,4 @@ public class Editor extends ArrayList<Object> {
 		return ts.toStr();
 	}
 
-	  public static void main(String[] args) {
-		  List<Object> run_iter_sample = new ArrayList<>();
-		  run_iter_sample.addAll(Arrays.asList("a b".split(" ")));
-		  run_iter_sample.add(Editor.cmdEnum.REVERSE);
-		  run_iter_sample.addAll(Arrays.asList("cd".split(" ")));
-		  run_iter_sample.add(Editor.cmdEnum.REVERSE);
-		  run_iter_sample.addAll(Arrays.asList("e f".split(" ")));
-		  Editor.RunIter run_iter = new Editor.RunIter(run_iter_sample, Editor.cmdEnum.REVERSE);
-		  List<List<Object>> output_list = new ArrayList<>();
-		  for (List<Object> part_list : run_iter) {
-			  output_list.add(part_list);
-		  }
-		  System.out.println(output_list.size());
-	  }
 }

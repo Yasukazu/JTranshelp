@@ -1,15 +1,6 @@
 package jp.yasukazu.transhelp
 
-import java.util.ArrayList
-import java.util.Arrays
-import java.util.Collections
-import java.util.EnumSet
-import java.util.HashMap
-
-import jp.yasukazu.transhelp.KTranshelp.punctEnum
-
-import java.util.HashSet
-import java.util.LinkedList
+import java.util.*
 
 class Editor2
 /**
@@ -51,14 +42,14 @@ class Editor2
         override fun exec(lst: MutableList<Any>, ce: cmdEnum) {
             val nList = mutableListOf<Any>()
             try {
-                for (list in RunIter(lst, ce)) {
-                    if (list.contains(ce)) {
-                        val aList = mutableListOf<Any>(list)
-                        aList.reverse() // Collections.reverse(aList)
-                        aList.remove(ce)
-                        nList.addAll(aList)
+                for (run in RunIter(lst, ce)) {
+                    if (run.contains(ce)) {
+                        val ran = run.toMutableList()//mutableListOf<Any>(run)
+                        ran.reverse() // Collections.reverse(aList)
+                        ran.remove(ce)
+                        nList.addAll(ran)
                     } else
-                        nList.addAll(list)
+                        nList.addAll(run)
                 }
             } catch (e: TranshelpError) {
                 throw TranshelpException("Error in Reverse: " + e.message)
@@ -198,10 +189,10 @@ class Editor2
         class RecurEdit(var ck: cmdEnum) {
             @Throws(TranshelpException::class)
             fun recurExec(lst: MutableList<Any>, nest: Int) {
-                val tmpList = ArrayList<List<Any>>()
-                for (split in idgCommaSplit(lst)) {
-                    val asplit = mutableListOf<Any>(split)
+                //val tmpList = ArrayList<List<Any>>()
+                val tmpList = idgCommaSplit (lst).map { split -> //split in idgCommaSplit(lst)) {
                     if (split.contains(ck)) {
+                        val asplit = split.toMutableList()//mutableListOf<Any>(*split)
                         try {
                             ck.cmd.exec(asplit, ck)
                             for (it in asplit) {
@@ -212,19 +203,22 @@ class Editor2
                         } catch (e: TranshelpException) {
                             throw TranshelpException(e.message)
                         }
-
+                        asplit // tmpList.add(asplit)
                     }
-                    tmpList.add(asplit)
+                    else
+                        split //tmpList.add(split)
                 }
-                lst.clear()
+                val lst2 = ArrayList<Any>()
+                //lst.clear()
                 val tmpList_size = tmpList.size
                 for (i in 0 until tmpList_size) {
-                    val iList = tmpList[i]
-                    lst.addAll(iList)
+                    //val iList = tmpList[i]
+                    lst2.addAll(tmpList[i])//addAll(tmpList[i])
                     if (i < tmpList_size - 1)
-                        lst.add(punctEnum.IDGCOMMA)
+                        lst2.add(punctEnum.IDGCOMMA)
                 }
-
+                lst.clear()
+                lst.addAll(lst2)
             }
         }
 
@@ -248,7 +242,7 @@ class Editor2
             fun recur(stack: List<Any>) {
                 for (obj in stack) {
                     if (obj is EnclosedArray2) {
-                        val print = obj.pair == EnBlock.BracketPair.BRACKET
+                        val print = obj.pair != EnBlock.BracketPair.NUL
                         if (print)
                             bldr.append(obj.begin)
                         recur(obj)
@@ -301,7 +295,7 @@ class Editor2
 
         internal fun idgCommaSplit(list: List<Any>): List<List<Any>> {
             var list = list
-            val rList = mutableListOf<List<Any>>()
+            val rList = ArrayList<List<Any>>()
             var idx = 0
             do {
                 idx = list.indexOf(punctEnum.IDGCOMMA)
