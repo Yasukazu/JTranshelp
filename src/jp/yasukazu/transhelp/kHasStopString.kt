@@ -2,7 +2,6 @@ package jp.yasukazu.transhelp
 
 import java.util.EnumSet
 
-import jp.yasukazu.transhelp.TransHelp.punctEnum
 // 2018/8/31 : wide stop characters
 import java.util.HashSet
 
