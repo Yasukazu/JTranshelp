@@ -8,8 +8,9 @@ import java.util.HashSet
 import java.util.LinkedList
 
 import java.text.Normalizer
-import kotlin.streams.toList
 import jp.yasukazu.transhelp.HasStopString2 as HasStopString
+import jp.yasukazu.transhelp.Editor2 as Editor
+
 class TransHelp
 //List<HasStopString> sentences;
 /**
@@ -22,30 +23,8 @@ class TransHelp
         W_SPC('\u3000')
     }
 
-    internal enum class punctEnum constructor(c: Char) {
-        IDGCOMMA('\u3001'), //KUTEN \
-        IDGFSTOP('\u3002'), //TOUTEN o
-        EXCL('!'),
-        QSTN('?'),
-        COMMA(','),
-        FLSTOP('.'),
-        COLON(':'),
-        SEMI(';'),
-        WEXCL('\uFF01'),
-        WQSTN('\uFF1F'),
-        WCOMMA('\uFF0C'),
-        WFLSTOP('\uFF0E'),
-        WCOLON('\uFF1A'),
-        WSEMI('\uFF1B');
-
-        @JvmField
-        var ch = c
-
-    }
-
     init {
-        val nlines = lines.stream()
-                .map { line -> Normalizer.normalize(line.trim()/* { it <= ' ' }*/,
+        val nlines = lines.map { line -> Normalizer.normalize(line.trim()/* { it <= ' ' }*/,
                         Normalizer.Form.NFC) }
                 //.collect<List<String>, Any>(Collectors.toList())
         addAll(getYsentence(nlines.toList()))
@@ -60,7 +39,8 @@ class TransHelp
     internal fun stop_split(line: String): List<HasStopString> {
         val rgx_dlms = "(?<=[" + punctEnum.IDGFSTOP.ch + "])"
         val lines = line.split(rgx_dlms.toRegex())
-        return lines.map(HasStopString.Companion::toHasStopString)
+        val fLines = lines.filter { it -> it.isNotEmpty() }
+        return fLines.map(HasStopString.Companion::toHasStopString)
     }
 
     /**
@@ -68,13 +48,13 @@ class TransHelp
      * @return
      */
     @Throws(TranshelpException::class)
-    fun editAll(): List<Editor2> {
-        val editorList = ArrayList<Editor2>()
+    fun editAll(): List<Editor> {
+        val editorList = ArrayList<Editor>()
         try {
             for (snt in this) {
                 val block = EnBlock(snt.str)
-                val edt = Editor2(block, snt.stop)
-                edt.recurEdit(Editor2.cmdEnum.REVERSE) //do_reverse();
+                val edt = Editor(block, snt.stop)
+                edt.recurEdit(Editor.cmdEnum.REVERSE) //do_reverse();
                 editorList.add(edt)
             }
         } catch (e: TranshelpException) {
