@@ -108,13 +108,13 @@ public class Transhelp extends ArrayList<HasStopString> {
    * @exception 
    * @return 
    */
-  public List<Editor> editAll() throws TranshelpException {
-	  List<Editor> editorList = new ArrayList<Editor> ();
+  public List<Editor2> editAll() throws TranshelpException {
+	  List<Editor2> editorList = new ArrayList<Editor2> ();
 	  try {
 		  for(HasStopString snt : this) {
-				Enblock block = new Enblock(snt.str);
-			  Editor edt = new Editor(block, snt.stop);
-				  edt.recurEdit(Editor.cmdEnum.REVERSE); //do_reverse();
+				EnBlock block = new EnBlock(snt.str);
+			  Editor2 edt = new Editor2(block, snt.stop);
+				  edt.recurEdit(Editor2.cmdEnum.REVERSE); //do_reverse();
 				  editorList.add(edt);
 			  }
 		}
