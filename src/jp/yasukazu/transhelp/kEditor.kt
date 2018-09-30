@@ -1,14 +1,6 @@
 package jp.yasukazu.transhelp
 
-import java.util.ArrayList
-import java.util.Arrays
-import java.util.EnumSet
-import java.util.HashMap
-
-import jp.yasukazu.transhelp.TransHelp.punctEnum
-
-import java.util.HashSet
-import java.util.LinkedList
+import java.util.*
 
 class Editor2
 /**
@@ -197,8 +189,8 @@ class Editor2
         class RecurEdit(var ck: cmdEnum) {
             @Throws(TranshelpException::class)
             fun recurExec(lst: MutableList<Any>, nest: Int) {
-                val tmpList = ArrayList<List<Any>>()
-                for (split in idgCommaSplit(lst)) {
+                //val tmpList = ArrayList<List<Any>>()
+                val tmpList = idgCommaSplit (lst).map { split -> //split in idgCommaSplit(lst)) {
                     if (split.contains(ck)) {
                         val asplit = split.toMutableList()//mutableListOf<Any>(*split)
                         try {
@@ -211,10 +203,10 @@ class Editor2
                         } catch (e: TranshelpException) {
                             throw TranshelpException(e.message)
                         }
-                        tmpList.add(asplit)
+                        asplit // tmpList.add(asplit)
                     }
                     else
-                        tmpList.add(split)
+                        split //tmpList.add(split)
                 }
                 val lst2 = ArrayList<Any>()
                 //lst.clear()
@@ -303,7 +295,7 @@ class Editor2
 
         internal fun idgCommaSplit(list: List<Any>): List<List<Any>> {
             var list = list
-            val rList = mutableListOf<List<Any>>()
+            val rList = ArrayList<List<Any>>()
             var idx = 0
             do {
                 idx = list.indexOf(punctEnum.IDGCOMMA)
