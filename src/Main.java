@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import java.io.IOException;
 import jp.yasukazu.transhelp.*;
 
+
 class Main {
   public static void main(String[] args) {
     String usage_filename = "README.md";
@@ -16,13 +17,13 @@ class Main {
     {
 	  usage_stream.forEach(System.out::println);
 	  List<String> lines = stream.map(String::trim).collect(Collectors.toList());
-	  Transhelp thelp = new Transhelp(lines);
+	  TransHelp thelp = new TransHelp(lines);
 
-		List<Editor> editorList = thelp.editAll();	
+		List<Editor2> editorList = thelp.editAll();
 		  for (int i = 0; i < thelp.size(); ++i) {
-			  HasStopString hstr = thelp.get(i);
+			  HasStopString2 hstr = thelp.get(i);
 			  System.out.println("Orig: " + hstr.getStr() + hstr.getStop());
-			  Editor edt = editorList.get(i);
+			  Editor2 edt = editorList.get(i);
 			  System.out.println("Edit: " + edt.toString() + edt.getStop());			  
 		  }
 	}
