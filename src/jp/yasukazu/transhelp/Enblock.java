@@ -9,7 +9,7 @@ import java.util.Set;
 
 import java.util.Map;
 
-import jp.yasukazu.transhelp.Transhelp.punct;
+import jp.yasukazu.transhelp.Transhelp.spaceCharEnum;
 
 @SuppressWarnings("serial")
 public class Enblock extends ArrayList<Object> {
@@ -19,9 +19,9 @@ public class Enblock extends ArrayList<Object> {
 		dlmSet = new HashSet<Character>();
 		for(char ch : Editor.cmdCharSet)
 			dlmSet.add(ch);
-		dlmSet.add(punct.IDGCOMMA.ch);
+		dlmSet.add(punctEnum.IDGCOMMA.ch);
 		dlmMap = new HashMap<Character,Character>(Editor.cmdCharMap);
-		dlmMap.put(punct.IDGCOMMA.ch, punct.IDGCOMMA.ch);
+		dlmMap.put(punctEnum.IDGCOMMA.ch, punctEnum.IDGCOMMA.ch);
 	}
 
 	public Enblock(String txt) throws TranshelpException {
@@ -44,7 +44,7 @@ public class Enblock extends ArrayList<Object> {
 		WCBRKT("\u300e\u300f"), // niju-kagi-kakko
 		NUL("  "),
 		;
-		public char[] set;
+		char[] set;
 		bracketPair(String str){
 			set = new char[2];
 			set[0] = str.charAt(0);
@@ -56,7 +56,8 @@ public class Enblock extends ArrayList<Object> {
 		public char getEnd() {
 			return set[1];
 		}
-	};
+		public char[] getPair() { return set;}
+	}
 
 	public static bracketPair getPair(char ch) {
 		switch (ch) {
@@ -125,16 +126,16 @@ public class Enblock extends ArrayList<Object> {
 	}
 
 	
-	static String spc_dlmrx = "[\\s" + Transhelp.spaceCharEnum.WSPC.ch + "]+";
-	static String idgcomma_dlmrx = '(' + rgx_remaining(punct.IDGCOMMA.ch) + ')'; 
-	static String dlmrx = String.join("|", en_paren(spc_dlmrx), en_paren(idgcomma_dlmrx));//, en_paren(rgx_set_remaining(Editor.cmdCharSet)));
+	static String spc_dlmrx = "[\\s" + spaceCharEnum.WSPC.ch + "]+";
+	static String idgcomma_dlmrx = '(' + rgx_remaining(punctEnum.IDGCOMMA.ch) + ')';
+	static String dlmrx = String.join("|", en_paren(spc_dlmrx), en_paren(idgcomma_dlmrx));//, en_paren(rgx_set_remaining(Editor2.cmdCharSet)));
 	static List<Object> dlmrx_convert(StringBuilder buff) {
 		List<Object> rList = new ArrayList<>();
 		for (String tk : Arrays.asList(buff.toString().split(dlmrx))) {
 			if (tk.length() == 1) {
 				char ch = tk.charAt(0);
-				if (ch == punct.IDGCOMMA.ch)
-					rList.add(punct.IDGCOMMA);
+				if (ch == punctEnum.IDGCOMMA.ch)
+					rList.add(punctEnum.IDGCOMMA);
 				else if (Editor.cmdCharSet.contains(ch))
 					rList.add(Editor.charCmdEnumMap.get(ch));
 				else
@@ -151,11 +152,11 @@ public class Enblock extends ArrayList<Object> {
 		}
 		List<Object> stack = new ArrayList<>();
 		StringBuilder buff = new StringBuilder();
-		//String dlmrx = "[\\s" + Transhelp.spaceCharEnum.WSPC.ch + "]+";		
+		//String dlmrx = "[\\s" + TransHelp.spaceCharEnum.W_SPC.ch + "]+";
 		for (int pos = 0; pos < st.length(); ++pos) {
 			char ch = st.charAt(pos);
-			Enblock.bracketPair pair = Enblock.getPair(ch); 
-			if (pair != Enblock.bracketPair.NUL) {
+			bracketPair pair = getPair(ch);
+			if (pair != bracketPair.NUL) {
 				if (buff.length() > 0 && buff.toString().trim().length() > 0) {
 					stack.addAll(dlmrx_convert(buff));
 					buff.setLength(0);
@@ -164,7 +165,7 @@ public class Enblock extends ArrayList<Object> {
 					return stack;
 				String nst = st.substring(pos + 1);
 				try {
-					String n2st = Enblock.bracket_content(nst, pair);
+					String n2st = bracket_content(nst, pair);
 					if (n2st.length() > 0) {
 						stack.add(new EnclosedArray(_load(n2st, level+1), pair));
 						pos += n2st.length() + 1;
