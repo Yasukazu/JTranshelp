@@ -6,8 +6,6 @@ import java.util.Arrays
 import java.util.HashMap
 import java.util.HashSet
 
-import jp.yasukazu.transhelp.KTranshelp.punctEnum
-
 class EnBlock @Throws(TranshelpException::class)
 constructor(txt: String) : ArrayList<Any>() {
 
@@ -124,7 +122,7 @@ constructor(txt: String) : ArrayList<Any>() {
         }
 
 
-        internal var spc_dlmrx = "[\\s" + KTranshelp.spaceCharEnum.W_SPC.ch + "]+"
+        internal var spc_dlmrx = "[\\s" + TransHelp.spaceCharEnum.W_SPC.ch + "]+"
         internal var idgcomma_dlmrx = '('.toString() + rgx_remaining(punctEnum.IDGCOMMA.ch) + ')'.toString()
         internal var dlmrx = arrayOf(en_paren(spc_dlmrx), en_paren(idgcomma_dlmrx)).joinToString("|")//, en_paren(rgx_set_remaining(Editor2.cmdCharSet)));
         internal fun dlmrx_convert(buff: StringBuilder): List<Any> {
@@ -154,7 +152,7 @@ constructor(txt: String) : ArrayList<Any>() {
             }
             val stack = ArrayList<Any>()
             val buff = StringBuilder()
-            //String dlmrx = "[\\s" + KTranshelp.spaceCharEnum.W_SPC.ch + "]+";
+            //String dlmrx = "[\\s" + TransHelp.spaceCharEnum.W_SPC.ch + "]+";
             var pos = 0
             while (pos < st.length) {
                 val ch = st[pos]
