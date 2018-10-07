@@ -27,7 +27,8 @@ fun main(args: Array<String >) {
     val usage_filename = "USAGE.md"
     val usageStream = TransHelp::class.java.getResourceAsStream(usage_filename)
     val filename = if (optionMap.contains('f') && optionMap['f']!!.isNotEmpty()) optionMap['f'] else "input.txt"//if (cmd.hasOption("f") && cmd.getOptionValue("f") != null) cmd.getOptionValue("f") else "input.txt"
-    var path = Paths.get(filename)
+    val startDir = System.getProperty("user.dir")
+    var path = Paths.get(startDir, filename)
     if (!Files.exists(path)) {
         println("$path does not exits.")
         exitProcess(1)
@@ -37,18 +38,17 @@ fun main(args: Array<String >) {
             //Files.lines(Paths.get(usage_filename), StandardCharsets.UTF_8).use { usage_stream ->
             println("Usage:")
             usageStream.bufferedReader().forEachLine(::println)
-                println()
-                val lines = stream.map<String> { it -> it.trim()} //.toList()
-                val tHelp = TransHelp(lines.toList())
+            println()
+            val lines = stream.map<String> { it -> it.trim()} //.toList()
+            val tHelp = TransHelp(lines.toList())
 
-                val editorList = tHelp.editAll()
-                for (i in tHelp.indices) {
-                    val hsStr = tHelp[i]
-                    println("Orig: " + hsStr.str + hsStr.stop)
-                    val edt = editorList[i]
-                    println("Edit: " + edt.toString() + edt.stop)
-                }
-
+            val editorList = tHelp.editAll()
+            for (i in tHelp.indices) {
+                val hsStr = tHelp[i]
+                println("Orig: " + hsStr.str + hsStr.stop)
+                val edt = editorList[i]
+                println("Edit: " + edt.toString() + edt.stop)
+            }
         }
     } catch (e: IOException) {
         print("IOException occured: ")
