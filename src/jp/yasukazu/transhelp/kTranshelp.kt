@@ -76,12 +76,15 @@ class TransHelp
                 punctEnum.WCOLON,
                 punctEnum.WSEMI
         )
-        internal val enclosure = arrayOf(
+        val enclosureChars = arrayOf( '(', ')', '[', ']', '{', '}',
+
                 '\uff08', '\uff09', '\u3014', '\u3015', '\uff3b', '\uff3d', '\uff5b', '\uff5d',
                 '\u3008', '\u3009', '\u300a', '\u300b', '\u300c', '\u300d', '\u300e', '\u300f',
                 '\u3010', '\u3011') // (42..59).each{|c|printf "'\\u%x', " % (c + 0xa1a0).chr(Encoding::EUC_JP).encode(Encoding::UTF_8).ord}
-        internal var punctCharSet: MutableSet<Char>
-        internal var punctCharStr: String
+        val openEnclosureChars = setOf(enclosureChars.filterIndexed { index, c ->  (index % 1) == 0})
+        val enclosureCharMap = HashMap<Char, Char>()
+        var punctCharSet: MutableSet<Char>
+        var punctCharStr: String
         var usageStream: InputStream
         init {
             punctCharSet = HashSet()
@@ -96,6 +99,10 @@ class TransHelp
             val usageFilename = "USAGE.md"
             val jClass = thisClass.java
             usageStream = jClass.getResourceAsStream(usageFilename)
+            enclosureChars.indices.forEach { index ->
+                if (index and 1 == 0)
+                    enclosureCharMap[enclosureChars[index]] = enclosureChars[index + 1]
+            }
 
         }
     }
