@@ -76,12 +76,25 @@ class TransHelp
                 punctEnum.WCOLON,
                 punctEnum.WSEMI
         )
+        val enclosurePairChars = arrayOf(
+                arrayOf('(', ')'),
+                arrayOf('[', ']'),
+                arrayOf('{', '}'),
+                arrayOf('\uff08', '\uff09'), // FULLWIDTH LEFT PARENTHESIS
+                arrayOf('\u3014', '\u3015'),
+                arrayOf('\uff3b', '\uff3d'),
+                arrayOf('\uff5b', '\uff5d'),
+                arrayOf('\u3008', '\u3009'),
+                arrayOf('\u300a', '\u300b'),
+                arrayOf('\u300c', '\u300d'),
+                arrayOf('\u300e', '\u300f'),
+                arrayOf('\u3010', '\u3011')
+        )
         val enclosureChars = arrayOf( '(', ')', '[', ']', '{', '}',
-
                 '\uff08', '\uff09', '\u3014', '\u3015', '\uff3b', '\uff3d', '\uff5b', '\uff5d',
                 '\u3008', '\u3009', '\u300a', '\u300b', '\u300c', '\u300d', '\u300e', '\u300f',
                 '\u3010', '\u3011') // (42..59).each{|c|printf "'\\u%x', " % (c + 0xa1a0).chr(Encoding::EUC_JP).encode(Encoding::UTF_8).ord}
-        val openEnclosureChars = setOf(enclosureChars.filterIndexed { index, c ->  (index % 1) == 0})
+        val openEnclosureChars = setOf(enclosurePairChars.map {it[0]}) //enclosureChars.filterIndexed { index, c ->  (index % 1) == 0})
         val enclosureCharMap = HashMap<Char, Char>()
         var punctCharSet: MutableSet<Char>
         var punctCharStr: String
@@ -103,6 +116,7 @@ class TransHelp
                 if (index and 1 == 0)
                     enclosureCharMap[enclosureChars[index]] = enclosureChars[index + 1]
             }
+
 
         }
     }
