@@ -25,9 +25,9 @@ class TransHelp
 
     init {
         val nlines = lines.map { line -> Normalizer.normalize(line.trim()/* { it <= ' ' }*/,
-                        Normalizer.Form.NFC) }
+                        Normalizer.Form.NFKC) }
                 //.collect<List<String>, Any>(Collectors.toList())
-        addAll(getYsentence(nlines.toList()))
+        addAll(getYsentence(nlines))
     }
 
     internal fun getYsentence(lines: List<String>): List<HasStopString> {
