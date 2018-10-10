@@ -23,7 +23,8 @@ constructor(txt: String) : ArrayList<Any>() {
     companion object {
         internal var dlmSet: MutableSet<Char>
         internal var dlmMap: MutableMap<Char, Char>
-
+        val bracketPairSet = setOf(BracketPair.values().map {it.begin})
+        val bracketPairMap = mutableMapOf<Char, BracketPair>()
         init {
             dlmSet = HashSet()
             for (ch in Editor2.cmdCharSet)
@@ -31,17 +32,20 @@ constructor(txt: String) : ArrayList<Any>() {
             dlmSet.add(punctEnum.IDGCOMMA.ch)
             dlmMap = HashMap(Editor2.cmdCharMap)
             dlmMap[punctEnum.IDGCOMMA.ch] = punctEnum.IDGCOMMA.ch
+            BracketPair.values().forEach { bracketPairMap[it.begin] = it }
         }
 
         fun getPair(ch: Char): BracketPair {
+            val pair = bracketPairMap[ch]
+            return if (pair == null) BracketPair.NUL else pair
+            /*
             when (ch) {
                 '(' -> return BracketPair.PAREN
                 '[' -> return BracketPair.BRACKET
                 '{' -> return BracketPair.BRACE
                 '\u300c' -> return BracketPair.CBRKT
                 '\u300e' -> return BracketPair.WCBRKT
-            }
-            return BracketPair.NUL
+            }*/
         }
 
         internal var MAX_NEST = 9
