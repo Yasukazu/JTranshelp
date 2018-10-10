@@ -1,6 +1,6 @@
 package jp.yasukazu.transhelp
 
-import jp.yasukazu.transhelp.EnBlock.BracketPair
+import jp.yasukazu.transhelp.BracketPair
 import java.util.ArrayList
 
 class EnclosedArray2 : ArrayList<Any> {
@@ -27,7 +27,7 @@ class EnclosedArray2 : ArrayList<Any> {
         if (pair != BracketPair.NUL) {
             this.add(0, "" + pair.begin)
             this.add("" + pair.end)
-            pair = EnBlock.BracketPair.NUL
+            pair = BracketPair.NUL
         }
     }
 

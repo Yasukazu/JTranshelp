@@ -20,27 +20,6 @@ constructor(txt: String) : ArrayList<Any>() {
         addAll(list)
     }
 
-    enum class BracketPair private constructor(str: String) {
-        PAREN("()"), // kakko
-        BRACKET("[]"), // kaku-kakko
-        BRACE("{}"), // nami-kakko
-        CBRKT("\u300c\u300d"), // kagi-kakko
-        WCBRKT("\u300e\u300f"), // niju-kagi-kakko
-        NUL("  ");
-
-        var set: CharArray
-        val begin: Char
-            get() = set[0]
-        val end: Char
-            get() = set[1]
-
-        init {
-            set = CharArray(2)
-            set[0] = str[0]
-            set[1] = str[1]
-        }
-    }
-
     companion object {
         internal var dlmSet: MutableSet<Char>
         internal var dlmMap: MutableMap<Char, Char>
@@ -157,7 +136,7 @@ constructor(txt: String) : ArrayList<Any>() {
             while (pos < st.length) {
                 val ch = st[pos]
                 val pair = EnBlock.getPair(ch)
-                if (pair != EnBlock.BracketPair.NUL) {
+                if (pair != BracketPair.NUL) {
                     if (buff.length > 0 && buff.toString().trim { it <= ' ' }.length > 0) {
                         stack.addAll(dlmrx_convert(buff))
                         buff.setLength(0)

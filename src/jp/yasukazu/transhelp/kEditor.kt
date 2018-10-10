@@ -242,7 +242,7 @@ class Editor2
             fun recur(stack: List<Any>) {
                 for (obj in stack) {
                     if (obj is EnclosedArray2) {
-                        val print = obj.pair != EnBlock.BracketPair.NUL
+                        val print = obj.pair != BracketPair.NUL
                         if (print)
                             bldr.append(obj.begin)
                         recur(obj)
