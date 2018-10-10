@@ -30,11 +30,11 @@ class Editor2
 
     interface Cmd {
         @Throws(TranshelpException::class)
-        fun exec(lst: MutableList<Any>, ch: cmdEnum)
+        fun exec(lst: MutableList<Any>, ce: cmdEnum)
     }
 
     internal class Void : Cmd {
-        override fun exec(lst: MutableList<Any>, ch: cmdEnum) {}
+        override fun exec(lst: MutableList<Any>, ce: cmdEnum) {}
     }
 
     internal class Reverse : Cmd {
