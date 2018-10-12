@@ -19,6 +19,10 @@ enum class BracketPair (val set: CharSequence) {
         get() = set[0]
     val end: Char
         get() = set[1]
+    companion object {
+        val beginCharSet = BracketPair.values().map {it.begin}.toSet()
+    }
+
 /*
     val str = "                arrayOf('\\u3008', '\\u3009'), // ANGLE BRACKET\n"
 val split = str.split("//")
