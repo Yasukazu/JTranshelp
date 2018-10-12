@@ -20,7 +20,8 @@ enum class BracketPair (val set: CharSequence) {
     val end: Char
         get() = set[1]
     companion object {
-        val beginCharSet = BracketPair.values().map {it.begin}.toSet()
+        val beginCharSet = BracketPair.values().filterNot { it == NUL }.map {it.begin}.toSet()
+        val beginCharMapValue = BracketPair.values().filterNot { it == NUL }.map {Pair(it.begin, it)}.toMap()
     }
 
 /*
