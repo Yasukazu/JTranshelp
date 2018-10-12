@@ -12,7 +12,7 @@ enum class BracketPair (val set: CharSequence) {
     //CORNER_BRACKET("\u300c\u300d"),
     //WHITE_CORNER_BRACKET("\u300e\u300f"),
     BLACK_LENTICULAR_BRACKET("\u3010\u3011"), // 【】
-    NUL("  ");
+    NUL("" + 0.toChar() + 0.toChar());
 
     //var set: CharArray
     val begin: Char
