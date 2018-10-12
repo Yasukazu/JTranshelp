@@ -139,8 +139,8 @@ constructor(txt: String) : ArrayList<Any>() {
             var pos = 0
             while (pos < st.length) {
                 val ch = st[pos]
-                val pair = EnBlock.getPair(ch)
-                if (pair != BracketPair.NUL) {
+                //val pair = EnBlock.getPair(ch)
+                if (BracketPair.beginCharSet.contains(ch)) { //pair != BracketPair.NUL) {
                     if (buff.length > 0 && buff.toString().trim { it <= ' ' }.length > 0) {
                         stack.addAll(dlmrx_convert(buff))
                         buff.setLength(0)
@@ -148,19 +148,21 @@ constructor(txt: String) : ArrayList<Any>() {
                     if (pos + 1 >= st.length)
                         return stack
                     val nst = st.substring(pos + 1)
-                    try {
-                        val n2st = bracket_content(nst, pair)
-                        if (n2st.length > 0) {
-                            stack.add(EnclosedArray2(_load(n2st, level + 1), pair))
-                            pos += n2st.length + 1
-                        } else {
-                            stack.add(EnclosedArray2(_load(nst, level + 1), pair))
-                            return stack
+                    val pair = BracketPair.beginCharMapValue[ch]
+                    if (pair != null) {
+                        try {
+                            val n2st = bracket_content(nst, pair)
+                            if (n2st.length > 0) {
+                                stack.add(EnclosedArray2(_load(n2st, level + 1), pair))
+                                pos += n2st.length + 1
+                            } else {
+                                stack.add(EnclosedArray2(_load(nst, level + 1), pair))
+                                return stack
+                            }
+                        } catch (e: TranshelpException) {
+                            throw TranshelpException("${e.message}:bracket_content:$nst")
                         }
-                    } catch (e: TranshelpException) {
-                        throw TranshelpException("bracket_content:$nst")
                     }
-
                 } else {
                     buff.append(ch)
                 }
