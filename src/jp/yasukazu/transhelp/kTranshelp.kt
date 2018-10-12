@@ -25,9 +25,9 @@ class TransHelp
 
     init {
         val nlines = lines.map { line -> Normalizer.normalize(line.trim()/* { it <= ' ' }*/,
-                        Normalizer.Form.NFC) }
+                        Normalizer.Form.NFKC) }
                 //.collect<List<String>, Any>(Collectors.toList())
-        addAll(getYsentence(nlines.toList()))
+        addAll(getYsentence(nlines))
     }
 
     internal fun getYsentence(lines: List<String>): List<HasStopString> {
@@ -76,19 +76,27 @@ class TransHelp
                 punctEnum.WCOLON,
                 punctEnum.WSEMI
         )
+        val cjkBracketCharMap = mapOf(
+                Pair('\uff08', '('), // Parenthesis
+                Pair('\uff09', ')'),
+                Pair('\uff3b', '['),
+                Pair('\uff3d', ']'), // Square Bracket
+                Pair('\uff5b', '{'),
+                Pair('\uff5d', '}') // Curly Bracket
+        )
         val enclosurePairChars = arrayOf(
                 arrayOf('(', ')'),
                 arrayOf('[', ']'),
                 arrayOf('{', '}'),
-                arrayOf('\uff08', '\uff09'), // FULLWIDTH LEFT PARENTHESIS
-                arrayOf('\u3014', '\u3015'),
-                arrayOf('\uff3b', '\uff3d'),
-                arrayOf('\uff5b', '\uff5d'),
-                arrayOf('\u3008', '\u3009'),
-                arrayOf('\u300a', '\u300b'),
-                arrayOf('\u300c', '\u300d'),
-                arrayOf('\u300e', '\u300f'),
-                arrayOf('\u3010', '\u3011')
+                arrayOf('\uff08', '\uff09'), // FULLWIDTH PARENTHESIS
+                arrayOf('\u3014', '\u3015'), // TORTOISE SHELL BRACKET
+                arrayOf('\uff3b', '\uff3d'), // Fullwidth Square Bracket
+                arrayOf('\uff5b', '\uff5d'), // Fullwidth Curly Bracket
+                arrayOf('\u3008', '\u3009'), // ANGLE BRACKET
+                arrayOf('\u300a', '\u300b'), // DOUBLE ANGLE BRACKET
+                arrayOf('\u300c', '\u300d'), // CORNER BRACKET
+                arrayOf('\u300e', '\u300f'), // WHITE CORNER BRACKET
+                arrayOf('\u3010', '\u3011')  // BLACK LENTICULAR BRACKET
         )
         val enclosureChars = arrayOf( '(', ')', '[', ']', '{', '}',
                 '\uff08', '\uff09', '\u3014', '\u3015', '\uff3b', '\uff3d', '\uff5b', '\uff5d',

@@ -30,11 +30,11 @@ class Editor2
 
     interface Cmd {
         @Throws(TranshelpException::class)
-        fun exec(lst: MutableList<Any>, ch: cmdEnum)
+        fun exec(lst: MutableList<Any>, ce: cmdEnum)
     }
 
     internal class Void : Cmd {
-        override fun exec(lst: MutableList<Any>, ch: cmdEnum) {}
+        override fun exec(lst: MutableList<Any>, ce: cmdEnum) {}
     }
 
     internal class Reverse : Cmd {
@@ -191,7 +191,7 @@ class Editor2
             fun recurExec(lst: MutableList<Any>, nest: Int) {
                 //val tmpList = ArrayList<List<Any>>()
                 val tmpList = idgCommaSplit (lst).map { split -> //split in idgCommaSplit(lst)) {
-                    if (split.contains(ck)) {
+                    //if (split.contains(ck)) {
                         val asplit = split.toMutableList()//mutableListOf<Any>(*split)
                         try {
                             ck.cmd.exec(asplit, ck)
@@ -204,9 +204,9 @@ class Editor2
                             throw TranshelpException(e.message)
                         }
                         asplit // tmpList.add(asplit)
-                    }
+                    /*}
                     else
-                        split //tmpList.add(split)
+                        split */
                 }
                 val lst2 = ArrayList<Any>()
                 //lst.clear()
@@ -242,7 +242,7 @@ class Editor2
             fun recur(stack: List<Any>) {
                 for (obj in stack) {
                     if (obj is EnclosedArray2) {
-                        val print = obj.pair != EnBlock.BracketPair.NUL
+                        val print = obj.pair != BracketPair.NUL
                         if (print)
                             bldr.append(obj.begin)
                         recur(obj)

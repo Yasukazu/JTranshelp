@@ -20,31 +20,11 @@ constructor(txt: String) : ArrayList<Any>() {
         addAll(list)
     }
 
-    enum class BracketPair private constructor(str: String) {
-        PAREN("()"), // kakko
-        BRACKET("[]"), // kaku-kakko
-        BRACE("{}"), // nami-kakko
-        CBRKT("\u300c\u300d"), // kagi-kakko
-        WCBRKT("\u300e\u300f"), // niju-kagi-kakko
-        NUL("  ");
-
-        var set: CharArray
-        val begin: Char
-            get() = set[0]
-        val end: Char
-            get() = set[1]
-
-        init {
-            set = CharArray(2)
-            set[0] = str[0]
-            set[1] = str[1]
-        }
-    }
-
     companion object {
         internal var dlmSet: MutableSet<Char>
         internal var dlmMap: MutableMap<Char, Char>
-
+        val bracketPairSet = setOf(BracketPair.values().map {it.begin})
+        val bracketPairMap = mutableMapOf<Char, BracketPair>()
         init {
             dlmSet = HashSet()
             for (ch in Editor2.cmdCharSet)
@@ -52,17 +32,20 @@ constructor(txt: String) : ArrayList<Any>() {
             dlmSet.add(punctEnum.IDGCOMMA.ch)
             dlmMap = HashMap(Editor2.cmdCharMap)
             dlmMap[punctEnum.IDGCOMMA.ch] = punctEnum.IDGCOMMA.ch
+            BracketPair.values().forEach { bracketPairMap[it.begin] = it }
         }
 
         fun getPair(ch: Char): BracketPair {
+            val pair = bracketPairMap[ch]
+            return if (pair == null) BracketPair.NUL else pair
+            /*
             when (ch) {
                 '(' -> return BracketPair.PAREN
                 '[' -> return BracketPair.BRACKET
                 '{' -> return BracketPair.BRACE
                 '\u300c' -> return BracketPair.CBRKT
                 '\u300e' -> return BracketPair.WCBRKT
-            }
-            return BracketPair.NUL
+            }*/
         }
 
         internal var MAX_NEST = 9
@@ -157,7 +140,7 @@ constructor(txt: String) : ArrayList<Any>() {
             while (pos < st.length) {
                 val ch = st[pos]
                 val pair = EnBlock.getPair(ch)
-                if (pair != EnBlock.BracketPair.NUL) {
+                if (pair != BracketPair.NUL) {
                     if (buff.length > 0 && buff.toString().trim { it <= ' ' }.length > 0) {
                         stack.addAll(dlmrx_convert(buff))
                         buff.setLength(0)
