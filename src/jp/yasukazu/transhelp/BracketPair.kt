@@ -9,9 +9,9 @@ enum class BracketPair (val set: CharSequence) {
     TORTOISE_SHELL_BRACKET("\u3014\u3015"), //kikko-kakko
     ANGLE_BRACKET("〈〉"),
     DOUBLE_ANGLE_BRACKET("《》"),
-    CORNER_BRACKET("\u300c\u300d"),
-    WHITE_CORNER_BRACKET("\u300e\u300f"),
-    BLACK_LENTICULAR_BRACKET("\u3010\u3011"),
+    //CORNER_BRACKET("\u300c\u300d"),
+    //WHITE_CORNER_BRACKET("\u300e\u300f"),
+    BLACK_LENTICULAR_BRACKET("\u3010\u3011"), // 【】
     NUL("  ");
 
     //var set: CharArray
