@@ -111,19 +111,22 @@ constructor(txt: String) : ArrayList<Any>() {
         internal fun dlmrx_convert(buff: StringBuilder): List<Any> {
             val rList = mutableListOf<Any>()
             for (tk in Arrays.asList(*buff.toString().split(dlmrx.toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray())) {
+                rList +=
                 if (tk.length == 1) {
                     val ch = tk[0]
                     if (ch == punctEnum.IDGCOMMA.ch)
-                        rList.add(punctEnum.IDGCOMMA)
+                        punctEnum.IDGCOMMA
                     else if (Editor2.cmdCharSet.contains(ch)) {
                         val ce = Editor2.charCmdEnumMap[ch]
                         if (ce != null)
-                            rList += ce
+                            ce
+                        else
+                            tk
                     }
                     else
-                        rList.add(tk)
+                        tk
                 } else
-                    rList.add(tk)
+                    tk
             }
             return rList
         }
@@ -150,17 +153,16 @@ constructor(txt: String) : ArrayList<Any>() {
                     val nst = st.substring(pos + 1)
                     try {
                         val n2st = bracket_content(nst, pair)
-                        if (n2st.length > 0) {
-                            stack.add(EnclosedArray2(_load(n2st, level + 1), pair))
-                            pos += n2st.length + 1
-                        } else {
-                            stack.add(EnclosedArray2(_load(nst, level + 1), pair))
-                            return stack
-                        }
                     } catch (e: TranshelpException) {
-                        throw TranshelpException("bracket_content:$nst")
+                        throw TranshelpException("bracket_content:${nst}, ${pair}")
                     }
-
+                    if (n2st.length > 0) {
+                        stack.add(EnclosedArray2(_load(n2st, level + 1), pair))
+                        pos += n2st.length + 1
+                    } else {
+                        stack.add(EnclosedArray2(_load(nst, level + 1), pair))
+                        return stack
+                    }
                 } else {
                     buff.append(ch)
                 }
