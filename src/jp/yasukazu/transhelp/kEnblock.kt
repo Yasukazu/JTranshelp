@@ -141,7 +141,7 @@ constructor(txt: String) : ArrayList<Any>() {
                 val ch = st[pos]
                 //val pair = EnBlock.getPair(ch)
                 if (BracketPair.beginCharSet.contains(ch)) { //pair != BracketPair.NUL) {
-                    if (buff.length > 0 && buff.toString().trim { it <= ' ' }.length > 0) {
+                    if (buff.length > 0 && buff.toString().trim().length > 0) { //  { it <= ' ' } predicate:Unicode <= ' '
                         stack.addAll(dlmrx_convert(buff))
                         buff.setLength(0)
                     }
@@ -168,7 +168,7 @@ constructor(txt: String) : ArrayList<Any>() {
                 }
                 ++pos
             }
-            if (buff.length > 0 && buff.toString().trim { it <= ' ' }.length > 0)
+            if (buff.length > 0 && buff.toString().trim().length > 0)
                 stack.addAll(dlmrx_convert(buff))
             return stack
         }
