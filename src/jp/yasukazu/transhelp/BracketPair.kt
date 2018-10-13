@@ -9,16 +9,21 @@ enum class BracketPair (val set: CharSequence) {
     TORTOISE_SHELL_BRACKET("\u3014\u3015"), //kikko-kakko
     ANGLE_BRACKET("〈〉"),
     DOUBLE_ANGLE_BRACKET("《》"),
-    CORNER_BRACKET("\u300c\u300d"),
-    WHITE_CORNER_BRACKET("\u300e\u300f"),
-    BLACK_LENTICULAR_BRACKET("\u3010\u3011"),
-    NUL("  ");
+    //CORNER_BRACKET("\u300c\u300d"),
+    //WHITE_CORNER_BRACKET("\u300e\u300f"),
+    BLACK_LENTICULAR_BRACKET("\u3010\u3011"), // 【】
+    NUL("" + 0.toChar() + 0.toChar());
 
     //var set: CharArray
     val begin: Char
         get() = set[0]
     val end: Char
         get() = set[1]
+    companion object {
+        val beginCharSet = BracketPair.values().filterNot { it == NUL }.map {it.begin}.toSet()
+        val beginCharMapValue = BracketPair.values().filterNot { it == NUL }.map {Pair(it.begin, it)}.toMap()
+    }
+
 /*
     val str = "                arrayOf('\\u3008', '\\u3009'), // ANGLE BRACKET\n"
 val split = str.split("//")
