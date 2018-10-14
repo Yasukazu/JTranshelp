@@ -105,12 +105,13 @@ constructor(txt: String) : ArrayList<Any>() {
         }
 
 
-        internal var spc_dlmrx = "[\\s" + TransHelp.spaceCharEnum.W_SPC.ch + "]+"
-        internal var idgcomma_dlmrx = '('.toString() + rgx_remaining(punctEnum.IDGCOMMA.ch) + ')'.toString()
-        internal var dlmrx = arrayOf(en_paren(spc_dlmrx), en_paren(idgcomma_dlmrx)).joinToString("|")//, en_paren(rgx_set_remaining(Editor2.cmdCharSet)));
-        internal fun dlmrx_convert(buff: StringBuilder): List<Any> {
+        internal val spc_dlmrx = "[\\s" + TransHelp.spaceCharEnum.W_SPC.ch + "]+"
+        internal val idgcomma_dlmrx = '('.toString() + rgx_remaining(punctEnum.IDGCOMMA.ch) + ')'.toString()
+        internal val dlmrx = arrayOf(en_paren(spc_dlmrx), en_paren(idgcomma_dlmrx)).joinToString("|")//, en_paren(rgx_set_remaining(Editor2.cmdCharSet)));
+        internal fun dlmrx_convert(buff: CharSequence): List<Any> {
             val rList = mutableListOf<Any>()
-            for (tk in Arrays.asList(*buff.toString().split(dlmrx.toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray())) {
+            buff.split(dlmrx.toRegex()).dropLastWhile { it.isEmpty() }.forEach {tk ->
+            //for (tk in Arrays.asList(*buff.toString().split(dlmrx.toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray())) {
                 if (tk.length == 1) {
                     val ch = tk[0]
                     if (ch == punctEnum.IDGCOMMA.ch)
