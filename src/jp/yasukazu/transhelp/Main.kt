@@ -25,14 +25,14 @@ class Main(val args: Array<String >) {
     }
     fun usage():List<CharSequence> {
         val bundle = ResourceBundle.getBundle("jp.yasukazu.transhelp.usage", UTF8_ENCODING_CONTROL)
-        var key = "TOTAL"
+        var key = ""
         try {
-            val total = bundle.getString(key).toInt()
-            val keyList = bundle.keys.toList().filterNot { it == "TOTAL" }.sortedBy { it.takeLastWhile { c -> c.isDigit() }.toInt() }
+            //val total = bundle.getString(key).toInt()
+            val keyList = bundle.keys.toList().sortedBy {it}//.sortedBy { it.takeLastWhile { c -> c.isDigit() }.toInt() }
             val list = ArrayList<String>()
             keyList.forEach {// (1..total)
-                //key = "L$it"
-                list += bundle.getString(it)
+                val s = bundle.getString(it)
+                list += " ".repeat(it.length - 1) + s
             }
             return list
         }
