@@ -18,10 +18,11 @@ class Main(val args: Array<String >) {
         var key = "TOTAL"
         try {
             val total = bundle.getString(key).toInt()
+            val keyList = bundle.keys.toList().filterNot { it == "TOTAL" }.sortedBy { it.takeLastWhile { c -> c.isDigit() }.toInt() }
             val list = ArrayList<String>()
-            (1..total).forEach {
-                key = "L$it"
-                list += bundle.getString(key)
+            keyList.forEach {// (1..total)
+                //key = "L$it"
+                list += bundle.getString(it)
             }
             return list
         }
