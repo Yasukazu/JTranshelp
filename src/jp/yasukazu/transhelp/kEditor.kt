@@ -40,23 +40,25 @@ class Editor2
     internal class Reverse : Cmd {
         @Throws(TranshelpException::class)
         override fun exec(lst: MutableList<Any>, ce: cmdEnum) {
-            val nList = mutableListOf<Any>()
+            val nList = mutableListOf<Any?>()
             try {
                 for (run in RunIter(lst, ce)) {
+                    nList.addAll(
                     if (run.contains(ce)) {
-                        val ran = run.toMutableList()//mutableListOf<Any>(run)
-                        ran.reverse() // Collections.reverse(aList)
-                        ran.remove(ce)
-                        nList.addAll(ran)
+                        //val ran = run.toMutableList()
+                        //ran.reverse()
+                        //ran.remove(ce)
+                        run.asReversed().map {it -> if (it == ce) null else it}
                     } else
-                        nList.addAll(run)
+                        run
+                    )
                 }
             } catch (e: TranshelpError) {
                 throw TranshelpException("Error in Reverse: " + e.message)
             }
 
             lst.clear()
-            lst.addAll(nList)
+            lst.addAll(nList.filterNotNull())
         }
 
     }
