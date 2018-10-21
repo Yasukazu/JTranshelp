@@ -18,7 +18,9 @@ enum class BracketPair (val set: CharSequence, val wide: CharSequence?=null) {
         get() = set[1]
 
     companion object {
-        val beginCharSet = BracketPair.values().filterNot { it == NUL }.map {it.begin}.toSet()
-        val beginCharMapValue = BracketPair.values().filterNot { it == NUL }.map {Pair(it.begin, it)}.toMap()
+        //val beginCharSet = BracketPair.values().filterNot { it == NUL }.map {it.begin}.toSet()
+        val beginCharMap = BracketPair.values().filterNot { it == NUL }.map {Pair(it.begin, it)}.toMap()
+        val wideBeginCharMap = BracketPair.values().filter { it.wide != null}.map {Pair(it.wide!![0], it.begin)}.toMap()
+        val wideEndCharMap = BracketPair.values().filter { it.wide != null}.map {Pair(it.wide!![1], it.end)}.toMap()
     }
 }
