@@ -141,7 +141,7 @@ constructor(txt: String) : ArrayList<Any>() {
             while (pos < st.length) {
                 val ch = st[pos]
                 //val pair = EnBlock.getPair(ch)
-                if (BracketPair.beginCharSet.contains(ch)) { //pair != BracketPair.NUL) {
+                if (ch in BracketPair.beginCharMap) { //pair != BracketPair.NUL) {
                     if (buff.length > 0 && buff.toString().trim().length > 0) { //  { it <= ' ' } predicate:Unicode <= ' '
                         stack.addAll(dlmrx_convert(buff))
                         buff.setLength(0)
@@ -149,7 +149,7 @@ constructor(txt: String) : ArrayList<Any>() {
                     if (pos + 1 >= st.length)
                         return stack
                     val nst = st.substring(pos + 1)
-                    val pair = BracketPair.beginCharMapValue[ch]
+                    val pair = BracketPair.beginCharMap[ch]
                     if (pair != null) {
                         try {
                             val n2st = bracket_content(nst, pair)
