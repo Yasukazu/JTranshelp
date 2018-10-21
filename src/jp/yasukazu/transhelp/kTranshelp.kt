@@ -10,6 +10,7 @@ import java.util.LinkedList
 import java.text.Normalizer
 import jp.yasukazu.transhelp.HasStopString2 as HasStopString
 import jp.yasukazu.transhelp.Editor2 as Editor
+import jp.yasukazu.transhelp.BracketPair
 
 class TransHelp
 //List<HasStopString> sentences;
@@ -24,8 +25,21 @@ class TransHelp
     }
 
     init {
-        val nlines = lines.map { line -> Normalizer.normalize(line.trim()/* { it <= ' ' }*/,
-                        Normalizer.Form.NFKC) }
+        val nlines = lines.map { line ->
+            line.map { ch ->
+                val wideBegin = BracketPair.wideBeginCharMap[ch]
+                if (wideBegin != null)
+                    wideBegin
+                else {
+                    val wideEnd = BracketPair.wideEndCharMap[ch]
+                    if (wideEnd != null)
+                        wideEnd
+                    else
+                        ch
+                }
+            }.joinToString("")
+            //Normalizer.normalize(line.trim()/* { it <= ' ' }*/,                        Normalizer.Form.NFKC)
+        }
                 //.collect<List<String>, Any>(Collectors.toList())
         addAll(getYsentence(nlines))
     }
