@@ -1,4 +1,4 @@
-# JTranshelp
+# JTransHelp : fork by Kotlin
 A translation helper program for English to Japanese translation implemented into Java. : 英和翻訳を助けるJavaプログラムです。
 ## How to use : 使い方
  1. Put 'direct-translated' sentence into a text file named 'input.txt'. : 英語を日本語に直訳した文を「input.txt」に入れて，
