@@ -105,12 +105,13 @@ constructor(txt: String) : ArrayList<Any>() {
         }
 
 
-        internal var spc_dlmrx = "[\\s" + TransHelp.spaceCharEnum.W_SPC.ch + "]+"
-        internal var idgcomma_dlmrx = '('.toString() + rgx_remaining(punctEnum.IDGCOMMA.ch) + ')'.toString()
-        internal var dlmrx = arrayOf(en_paren(spc_dlmrx), en_paren(idgcomma_dlmrx)).joinToString("|")//, en_paren(rgx_set_remaining(Editor2.cmdCharSet)));
-        internal fun dlmrx_convert(buff: StringBuilder): List<Any> {
+        internal val spc_dlmrx = "[\\s" + TransHelp.spaceCharEnum.W_SPC.ch + "]+"
+        internal val idgcomma_dlmrx = '('.toString() + rgx_remaining(punctEnum.IDGCOMMA.ch) + ')'.toString()
+        internal val dlmrx = arrayOf(en_paren(spc_dlmrx), en_paren(idgcomma_dlmrx)).joinToString("|")//, en_paren(rgx_set_remaining(Editor2.cmdCharSet)));
+        internal fun dlmrx_convert(buff: CharSequence): List<Any> {
             val rList = mutableListOf<Any>()
-            for (tk in Arrays.asList(*buff.toString().split(dlmrx.toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray())) {
+            buff.split(dlmrx.toRegex()).dropLastWhile { it.isEmpty() }.forEach {tk ->
+            //for (tk in Arrays.asList(*buff.toString().split(dlmrx.toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray())) {
                 if (tk.length == 1) {
                     val ch = tk[0]
                     if (ch == punctEnum.IDGCOMMA.ch)
@@ -140,15 +141,15 @@ constructor(txt: String) : ArrayList<Any>() {
             while (pos < st.length) {
                 val ch = st[pos]
                 //val pair = EnBlock.getPair(ch)
-                if (BracketPair.beginCharSet.contains(ch)) { //pair != BracketPair.NUL) {
-                    if (buff.length > 0 && buff.toString().trim { it <= ' ' }.length > 0) {
+                if (ch in BracketPair.beginCharMap) { //pair != BracketPair.NUL) {
+                    if (buff.length > 0 && buff.toString().trim().length > 0) { //  { it <= ' ' } predicate:Unicode <= ' '
                         stack.addAll(dlmrx_convert(buff))
                         buff.setLength(0)
                     }
                     if (pos + 1 >= st.length)
                         return stack
                     val nst = st.substring(pos + 1)
-                    val pair = BracketPair.beginCharMapValue[ch]
+                    val pair = BracketPair.beginCharMap[ch]
                     if (pair != null) {
                         try {
                             val n2st = bracket_content(nst, pair)
@@ -168,7 +169,7 @@ constructor(txt: String) : ArrayList<Any>() {
                 }
                 ++pos
             }
-            if (buff.length > 0 && buff.toString().trim { it <= ' ' }.length > 0)
+            if (buff.length > 0 && buff.toString().trim().length > 0)
                 stack.addAll(dlmrx_convert(buff))
             return stack
         }

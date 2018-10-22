@@ -1,6 +1,6 @@
 package jp.yasukazu.transhelp
 
-import java.util.*
+//import java.util.*
 
 class Editor2
 /**
@@ -8,7 +8,7 @@ class Editor2
  * @param list
  * @param stop
  */
-(list: List<Any>, stop: Char) : ArrayList<Any>(list) {
+(list: List<Any>, stop: Char) : MutableList<Any> by mutableListOf() {
 
 
     var stop: Char = ' '
@@ -29,7 +29,7 @@ class Editor2
     }
 
     interface Cmd {
-        @Throws(TranshelpException::class)
+        //@Throws(TransHelpException::class)
         fun exec(lst: MutableList<Any>, ce: cmdEnum)
     }
 
@@ -38,25 +38,24 @@ class Editor2
     }
 
     internal class Reverse : Cmd {
-        @Throws(TranshelpException::class)
+        //@Throws(TransHelpException::class)
         override fun exec(lst: MutableList<Any>, ce: cmdEnum) {
-            val nList = mutableListOf<Any>()
-            try {
+            val nList = mutableListOf<Any?>()
+            //try {
                 for (run in RunIter(lst, ce)) {
+                    nList.addAll(
                     if (run.contains(ce)) {
-                        val ran = run.toMutableList()//mutableListOf<Any>(run)
-                        ran.reverse() // Collections.reverse(aList)
-                        ran.remove(ce)
-                        nList.addAll(ran)
+                        //val ran = run.toMutableList()
+                        //ran.reverse()
+                        //ran.remove(ce)
+                        run.asReversed().map {it -> if (it == ce) null else it}
                     } else
-                        nList.addAll(run)
+                        run
+                    )
                 }
-            } catch (e: TranshelpError) {
-                throw TranshelpException("Error in Reverse: " + e.message)
-            }
-
+            //} catch (e: TranshelpError) {                throw TranshelpException("Error in Reverse: " + e.message)            }
             lst.clear()
-            lst.addAll(nList)
+            lst.addAll(nList.filterNotNull())
         }
 
     }
@@ -67,16 +66,12 @@ class Editor2
      * @next()
      */
     internal class RunIter(aa: List<Any>, var sym: cmdEnum) : Iterator<List<Any>>, Iterable<List<Any>> {
-        var queue: LinkedList<Any>
-
-        init {
-            this.queue = LinkedList(aa)
-        }
+        var queue = aa.toMutableList()
 
         fun ispat(aa: List<Any>): Boolean {
             if (aa.size < 2)
                 return false
-            return if (aa[0] is cmdEnum && aa[0] as cmdEnum == sym && aa[1] !is cmdEnum) true else false
+            return aa[0] is cmdEnum && aa[0] as cmdEnum == sym && aa[1] !is cmdEnum
         }
 
 
@@ -92,29 +87,27 @@ class Editor2
             val rList: MutableList<Any>
             var ps = queue.indexOf(sym)
             if (queue.size < 3 || ps < 0) {
-                rList = ArrayList(queue)
+                rList = queue.toMutableList()
                 queue.clear()
                 return rList
             }
-            if (ps == queue.size - 1)
-                throw TranshelpError("Ends with $sym")
+            check(ps < queue.size - 1) {"Ends with $sym"}                //throw TranshelpError
+            check(ps > 0) {"No item before $sym"}
             when (ps) {
-                0 //if (ps == 0)
-                -> throw TranshelpError("No item before $sym")
+                //if (ps == 0)                -> throw TranshelpError
                 1 -> {
-                    rList = ArrayList()
-                    rList.add(queue.poll())
+                    rList = mutableListOf(queue.removeAt(0)) //ArrayList()
+                    //rList.add(queue.poll())
                     while (ispat(queue)) {
-                        rList.add(queue.poll())
-                        rList.add(queue.poll())
+                        repeat(2) { rList.add(queue.removeAt(0))}
                     }
                     return rList
                 }
                 else //			if (ps > 1) {
                 -> {
-                    rList = ArrayList(queue.subList(0, ps - 1))
+                    rList = queue.slice(0..(ps - 1)).toMutableList()
                     while (ps-- > 1) {
-                        queue.poll() // drop
+                        queue.removeAt(0) // drop
                     }
                     return rList
                 }
